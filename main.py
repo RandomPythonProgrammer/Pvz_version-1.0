@@ -121,13 +121,16 @@ class Plant:
             else:
                 exec(self.data['tick'])
         except KeyError:
-            if (self.start_time - frame_number) % (1 / self.data['attack_speed']) == 0:
-                for i in range(self.data['burst']):
-                    self.queue.append(self.attack)
-            if frame_number % 25 == 0:
-                if len(self.queue) > 0:
-                    self.queue[0]()
-                    self.queue.remove(self.queue[0])
+            try:
+                if (self.start_time - frame_number) % (1 / self.data['attack_speed']) == 0:
+                    for i in range(self.data['burst']):
+                        self.queue.append(self.attack)
+                if frame_number % 25 == 0:
+                    if len(self.queue) > 0:
+                        self.queue[0]()
+                        self.queue.remove(self.queue[0])
+            except KeyError:
+                pass
 
     def attack(self):
         if type(self.data['attack']) == list:
@@ -210,7 +213,7 @@ class BottomBar:
         surface.blit(self.sprite, (self.x, self.y))
         for item in self.items:
             surface.blit(item['sprite'], (item['x'], item['y']))
-            surface.blit(font.render(f"Cost: {item['cost']}", False, (255, 200, 20)), (item['x'], item['y'] + SCALE))
+            surface.blit(font.render(f"Cost: {item['cost']}", False, (0, 0, 0)), (item['x'], item['y'] + SCALE))
             if item['cooldown'] > 0:
                 overlay = pg.Surface((SCALE, SCALE))
                 overlay.set_alpha(100)
@@ -218,7 +221,7 @@ class BottomBar:
                 surface.blit(overlay, (item['x'], item['y']))
             if self.selected == item['id']:
                 surface.blit(self.selected_sprite, (item['x'], item['y']))
-        surface.blit(font.render(f'Sun: {sun_count}', False, (255, 200, 20)), (0, 9 * SCALE))
+        surface.blit(font.render(f'Sun: {sun_count}', False, (0, 0, 0)), (0, 9 * SCALE))
 
 
 run = True
@@ -229,7 +232,7 @@ sun_count = 0
 suns = []
 projectiles = []
 selected_plant = None
-chosen_plants = ['plants:repeater', 'plants:sunflower', 'plants:potatomine']
+chosen_plants = ['plants:repeater', 'plants:sunflower', 'plants:potatomine', 'plants:walnut']
 bottom_bar = BottomBar(chosen_plants)
 zombies = []
 program_start_time = time.time()
@@ -247,7 +250,7 @@ def tick(frame_number):
     for projectile in projectiles:
         projectile.tick(frame_number)
     bottom_bar.tick(frame_number)
-    if 1000 - (program_start_time - time.time()) / 4 > 1:
+    if 1000 - (program_start_time - time.time())/2 > 1:
         if time.time() - program_start_time > 20 and random.randint(0, int(1000 - (program_start_time - time.time()) / 4)) == 1:
             zombies.append(Zombie('zombies:basic', SCALE*10, random.randint(1, 8)*SCALE, frame))
     else:

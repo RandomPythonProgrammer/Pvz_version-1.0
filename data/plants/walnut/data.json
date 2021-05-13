@@ -1,0 +1,8 @@
+{
+  "id": "walnut",
+  "health": 10000,
+  "sprite": "data/plants/repeater/sprite.png",
+  "cost": 50,
+  "cooldown": 35,
+  "starting_cooldown": 10
+}

@@ -1,4 +1,5 @@
 {
+  "id": "basic",
   "speed": 0.75,
   "health": 100,
   "sprite": "data/zombies/basic/sprite.png",
