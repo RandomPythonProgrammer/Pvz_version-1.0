@@ -1,0 +1,7 @@
+{
+  "id": "repeater",
+  "health": 100,
+  "sprite": "data/plants/repeater/sprite.png",
+  "cost": 200,
+  "cooldown": 10
+}
