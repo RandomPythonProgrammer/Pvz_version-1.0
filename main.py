@@ -247,8 +247,12 @@ def tick(frame_number):
     for projectile in projectiles:
         projectile.tick(frame_number)
     bottom_bar.tick(frame_number)
-    if time.time() - program_start_time > 20 and random.randint(0, int(1000 -(program_start_time - time.time())/2)) == 1:
-        zombies.append(Zombie('zombies:basic', SCALE*10, random.randint(1, 8)*SCALE, frame))
+    if 1000 - (program_start_time - time.time()) / 4 > 1:
+        if time.time() - program_start_time > 20 and random.randint(0, int(1000 - (program_start_time - time.time()) / 4)) == 1:
+            zombies.append(Zombie('zombies:basic', SCALE*10, random.randint(1, 8)*SCALE, frame))
+    else:
+        if time.time() - program_start_time > 20 and random.randint(0, 1) == 1:
+            zombies.append(Zombie('zombies:basic', SCALE*10, random.randint(1, 8)*SCALE, frame))
 
 
 def draw_screen(surface, frame_number):
