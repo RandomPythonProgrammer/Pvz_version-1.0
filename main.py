@@ -5,11 +5,11 @@ import random
 
 SCALE = 64
 FPS = 60
-SCREEN_HEIGHT = 13 * SCALE
+SCREEN_HEIGHT = 11 * SCALE
 SCREEN_WIDTH = 11 * SCALE
 
 pg.font.init()
-window = pg.display.set_mode((SCREEN_HEIGHT, SCREEN_WIDTH), pg.SCALED)
+window = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pg.SCALED)
 pg.display.set_caption('PVZ clone')
 pg.display.set_icon(pg.image.load('data/plants/repeater/sprite0.png').convert_alpha())
 clock = pg.time.Clock()
@@ -126,7 +126,7 @@ class Plant:
                 if (self.start_time - frame_number) % (1 / self.data['attack_speed']) == 0:
                     for i in range(self.data['burst']):
                         self.queue.append(self.attack)
-                if frame_number % 25 == 0:
+                if frame_number % 8 == 0:
                     if len(self.queue) > 0:
                         self.queue[0]()
                         self.queue.remove(self.queue[0])
@@ -240,7 +240,7 @@ program_start_time = time.time()
 
 
 def tick(frame_number):
-    if random.randint(0, 400) == 1:
+    if random.randint(0, 350) == 1:
         suns.append(Sun(random.randint(0, 10 * SCALE), random.randint(SCALE, 8 * SCALE)))
     for sun in suns:
         sun.tick(frame_number)
@@ -251,16 +251,20 @@ def tick(frame_number):
     for projectile in projectiles:
         projectile.tick(frame_number)
     bottom_bar.tick(frame_number)
-    if 1000 - (program_start_time - time.time())/2 > 1:
-        if time.time() - program_start_time > 20 and random.randint(0, int(1000 - (program_start_time - time.time()) / 4)) == 1:
-            zombies.append(Zombie('zombies:basic', SCALE*10, random.randint(1, 8)*SCALE, frame))
-    else:
-        if time.time() - program_start_time > 20 and random.randint(0, 1) == 1:
-            zombies.append(Zombie('zombies:basic', SCALE*10, random.randint(1, 8)*SCALE, frame))
+    if time.time() - program_start_time > 20:
+        chance = int(1000 - (program_start_time - time.time())*2.5)
+        if chance <= 0:
+            chance = 1
+        if random.randint(0, chance) == 1:
+            if random.randint(1, 101) > 90:
+                for i in range(random.randint(3, 9)):
+                    zombies.append(Zombie('zombies:basic', SCALE*10, random.randint(1, 8)*SCALE, frame))
+            else:
+                zombies.append(Zombie('zombies:basic', SCALE * 10, random.randint(1, 8) * SCALE, frame))
 
 
 def draw_screen(surface, frame_number):
-    surface.fill((0, 0, 0))
+    surface.fill((150, 150, 255))
 
     for tile in tiles:
         tile.draw(surface)

@@ -17,9 +17,9 @@
             ],
   "tick": [
     "self.countdown += 1",
-    "if self.countdown/60 >= 8:",
+    "if self.countdown/60 >= 10:",
     "    self.state = 1",
-    "    self.sprite = pg.image.load(data/plants/potatomine/sprite1.png)",
+    "    self.sprite = pg.image.load('data/plants/potatomine/sprite1.png')",
     "self.attack()"
   ],
   "projectile_speed": 8,
