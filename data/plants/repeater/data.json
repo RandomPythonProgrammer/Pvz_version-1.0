@@ -2,8 +2,8 @@
   "id": "repeater",
   "health": 100,
   "sprite": "data/plants/repeater/sprite.png",
-  "cost": 0,
-  "cooldown": 0,
+  "cost": 200,
+  "cooldown": 10,
   "attack_speed": 0.0025,
   "attack": [
              "count = 0",
