@@ -1,5 +1,6 @@
 {
   "speed": 0.75,
   "health": 100,
-  "sprite": "data/zombies/basic/sprite.png"
+  "sprite": "data/zombies/basic/sprite.png",
+  "damage": 20
 }

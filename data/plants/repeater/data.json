@@ -5,6 +5,7 @@
   "cost": 200,
   "cooldown": 10,
   "attack_speed": 0.005,
+  "starting_cooldown": 5,
   "attack": [
              "count = 0",
              "for zombie in zombies:",

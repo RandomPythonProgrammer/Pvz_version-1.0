@@ -1,0 +1,24 @@
+{
+  "id": "repeater",
+  "health": 100,
+  "sprite": "data/plants/repeater/sprite.png",
+  "cost": 25,
+  "cooldown": 25,
+  "attack_speed": null,
+  "starting_cooldown": 5,
+  "attack": [
+             "if self.state/60 >= 8:",
+             "    for zombie in zombies:",
+             "        if zombie.lane == self.lane and pg.Rect(zombie.x, zombie.y, SCALE, SCALE*2).colliderect(pg.Rect(self.x, self.y, SCALE, SCALE)):",
+             "            zombie.health -= self.data['damage']",
+             "            plants.remove(self)",
+             "            self.tile.occupied = False"
+            ],
+  "tick": [
+    "self.state += 1",
+    "self.attack()"
+  ],
+  "projectile_speed": 8,
+  "burst": 2,
+  "damage": 500
+}

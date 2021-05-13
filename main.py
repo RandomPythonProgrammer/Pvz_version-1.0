@@ -58,18 +58,40 @@ class Zombie:
         self.health = self.data['health']
         self.sprite = pg.image.load(get_data(self.id)['sprite']).convert_alpha()
         self.speed = self.data['speed']
+        self.eat = None
+        self.damage = self.data['damage']
 
     def tick(self, frame_number):
-        if frame_number % 3 == 0:
-            self.x -= self.speed
-            if self.x < 0:
-                print('lost')
+        try:
+            if len(self.data['tick']) > 0:
+                exec("\n".join(self.data['tick']))
+            else:
+                exec(self.data['tick'])
+        except KeyError:
+            if frame_number % 3 == 0 and self.eat is None:
+                self.x -= self.speed
+                if self.x < 0:
+                    print('lost')
+                    zombies.remove(self)
+            if frame_number % 25 == 0 and self.eat is not None:
+                self.eat.health -= self.damage
+                if self.eat.health <= 0:
+                    try:
+                        plants.remove(self.eat)
+                    except ValueError:
+                        pass
+                    self.eat = None
+            if self.health <= 0:
                 zombies.remove(self)
-        if self.health <= 0:
-            zombies.remove(self)
+            for plant in plants:
+                if pg.Rect(plant.x, plant.y, SCALE, SCALE).colliderect(pg.Rect(self.x, self.y, SCALE, SCALE*2)) and self.lane == plant.lane:
+                    self.eat = plant
 
     def attack(self):
-        pass
+        if type(self.data['attack']) == list:
+            exec(str("\n".join(self.data['attack'])))
+        else:
+            exec(str(self.data['attack']))
 
     def draw(self, surface):
         surface.blit(self.sprite, (int(self.x), int(self.y) - SCALE))
@@ -94,7 +116,10 @@ class Plant:
 
     def tick(self, frame_number):
         try:
-            exec(self.data['tick'])
+            if len(self.data['tick']) > 0:
+                exec("\n".join(self.data['tick']))
+            else:
+                exec(self.data['tick'])
         except KeyError:
             if (self.start_time - frame_number) % (1 / self.data['attack_speed']) == 0:
                 for i in range(self.data['burst']):
@@ -171,7 +196,7 @@ class BottomBar:
                     'sprite': pg.image.load(get_data(item)['sprite']).convert_alpha(),
                     'cost': get_data(item)['cost'],
                     'id': item,
-                    'cooldown': get_data(item)['cooldown']
+                    'cooldown': get_data(item)['starting_cooldown'],
                 },
             )
 
@@ -204,7 +229,7 @@ sun_count = 0
 suns = []
 projectiles = []
 selected_plant = None
-chosen_plants = ['plants:repeater', 'plants:sunflower']
+chosen_plants = ['plants:repeater', 'plants:sunflower', 'plants:potatomine']
 bottom_bar = BottomBar(chosen_plants)
 zombies = []
 program_start_time = time.time()
@@ -222,7 +247,7 @@ def tick(frame_number):
     for projectile in projectiles:
         projectile.tick(frame_number)
     bottom_bar.tick(frame_number)
-    if time.time() - program_start_time > 45 and random.randint(0, 600) == 1:
+    if time.time() - program_start_time > 20 and random.randint(0, int(1000 -(program_start_time - time.time())/2)) == 1:
         zombies.append(Zombie('zombies:basic', SCALE*10, random.randint(1, 8)*SCALE, frame))
 
 
@@ -281,6 +306,8 @@ while run:
                             for item in bottom_bar.items:
                                 if item['id'] == selected_plant:
                                     item['cooldown'] = get_data(item['id'])['cooldown']
+                                    selected_plant = None
+                                    bottom_bar.selected = None
 
         for sun in suns:
             if pg.Rect(sun.x, sun.y, SCALE / 2, SCALE / 2).collidepoint(pg.mouse.get_pos()):
