@@ -5,5 +5,6 @@
   "cost": 50,
   "attack": "suns.append(Sun((self.x+16) + random.randint(-16, 17), (self.y+16) + random.randint(-16, 17), sunflower=True))",
   "attack_speed": 0.002,
-  "cooldown": 10
+  "cooldown": 10,
+  "burst": 1
 }

@@ -1,12 +1,16 @@
+import sys
+
 import pygame as pg
 import json
 import random
 
 SCALE = 64
 FPS = 60
+SCREEN_HEIGHT = 13 * SCALE
+SCREEN_WIDTH = 11 * SCALE
 
 pg.font.init()
-window = pg.display.set_mode((13 * SCALE, 11 * SCALE), pg.SCALED)
+window = pg.display.set_mode((SCREEN_HEIGHT, SCREEN_WIDTH), pg.SCALED)
 pg.display.set_caption('PVZ clone')
 pg.display.set_icon(pg.image.load('data/plants/repeater/sprite.png').convert_alpha())
 clock = pg.time.Clock()
@@ -18,19 +22,58 @@ def get_data(full_id):
         return json.load(data_file)
 
 
+class Bullet:
+    def __init__(self, x, y, speed, damage, projectile_id):
+        self.x = x
+        self.y = y
+        self.speed = speed
+        self.damage = damage
+        self.lane = self.y / SCALE
+        self.sprite = pg.image.load(get_data(projectile_id)['sprite']).convert_alpha()
+
+    def tick(self, frame_number):
+        if frame_number % 2 == 0:
+            self.x += self.speed
+            for zombie in zombies:
+                if zombie.lane == self.lane:
+                    if pg.Rect(zombie.x, zombie.y, SCALE, SCALE).colliderect(pg.Rect(self.x, self.y, SCALE, SCALE)):
+                        zombie.health -= self.damage
+                        projectiles.remove(self)
+            if self.x > SCREEN_WIDTH:
+                projectiles.remove(self)
+
+    def draw(self, surface):
+        surface.blit(self.sprite, (self.x, self.y))
+
+
 class Zombie:
-    def __init__(self, zombie_id, connected_tile, frame_num):
+    def __init__(self, zombie_id, x, y, frame_num):
         self.id = zombie_id
-        self.tile = connected_tile
-        self.x = self.tile.x
-        self.y = self.tile.y
+        self.x = x
+        self.y = y
         self.start_time = frame_num
+        self.lane = self.y / SCALE
 
         self.data = get_data(zombie_id)
 
         self.health = self.data['health']
         self.sprite = pg.image.load(get_data(self.id)['sprite']).convert_alpha()
-        self.cost = self.data['cost']
+        self.speed = self.data['speed']
+
+    def tick(self, frame_number):
+        if frame_number % 3 == 0:
+            self.x -= self.speed
+            if self.x < 0:
+                print('lost')
+                zombies.remove(self)
+        if self.health <= 0:
+            zombies.remove(self)
+
+    def attack(self):
+        pass
+
+    def draw(self, surface):
+        surface.blit(self.sprite, (int(self.x), int(self.y) - SCALE))
 
 
 class Plant:
@@ -40,28 +83,33 @@ class Plant:
         self.x = self.tile.x
         self.y = self.tile.y
         self.start_time = frame_num
+        self.lane = self.x / SCALE
 
         self.data = get_data(plant_id)
 
         self.health = self.data['health']
         self.sprite = pg.image.load(get_data(self.id)['sprite']).convert_alpha()
         self.cost = self.data['cost']
+        self.state = 0
+        self.queue = []
 
     def tick(self, frame_number):
         try:
-            if (self.start_time-frame_number) % (1/self.data['attack_speed']) == 0:
-                self.attack()
+            exec(self.data['tick'])
         except KeyError:
-            pass
+            if (self.start_time - frame_number) % (1 / self.data['attack_speed']) == 0:
+                for i in range(self.data['burst']):
+                    self.queue.append(self.attack)
+            if frame_number % 25 == 0:
+                if len(self.queue) > 0:
+                    self.queue[0]()
+                    self.queue.remove(self.queue[0])
 
     def attack(self):
-        try:
-            exec(str(self.data['attack']))
-        except KeyError:
-            pass
+        exec(str(self.data['attack']))
 
     def draw(self, surface):
-        surface.blit(self.sprite, (self.x, self.y))
+        surface.blit(self.sprite, (int(self.x), int(self.y)))
 
 
 class Sun:
@@ -81,7 +129,7 @@ class Sun:
         self.speed = 1
 
     def draw(self, surface):
-        surface.blit(self.sprite, (self.x, self.y))
+        surface.blit(self.sprite, (int(self.x), int(self.y)))
 
     def tick(self, frame_number):
         if self.y < self.dest_y:
@@ -101,7 +149,7 @@ class Tile:
         self.sprite = pg.image.load(f'data/other/grass/grass{str(self.version)}-{str(self.species)}.png')
 
     def draw(self, surface):
-        surface.blit(self.sprite, (self.x, self.y))
+        surface.blit(self.sprite, (int(self.x), int(self.y)))
 
 
 class BottomBar:
@@ -116,18 +164,18 @@ class BottomBar:
         for item in items:
             self.items.append(
                 {
-                 'x': 1.25 * SCALE + items.index(item) * SCALE * 1.5,
-                 'y': 9.5 * SCALE,
-                 'sprite': pg.image.load(get_data(item)['sprite']).convert_alpha(),
-                 'cost': get_data(item)['cost'],
-                 'id': item,
-                 'cooldown': get_data(item)['cooldown']
-                 },
+                    'x': 1.25 * SCALE + items.index(item) * SCALE * 1.5,
+                    'y': 9.5 * SCALE,
+                    'sprite': pg.image.load(get_data(item)['sprite']).convert_alpha(),
+                    'cost': get_data(item)['cost'],
+                    'id': item,
+                    'cooldown': get_data(item)['cooldown']
+                },
             )
 
     def tick(self, frame_num):
         for item in self.items:
-            item['cooldown'] -= 1/FPS
+            item['cooldown'] -= 1 / FPS
             if item['cooldown'] < 0:
                 item['cooldown'] = 0
 
@@ -152,10 +200,11 @@ plants = []
 font = pg.font.SysFont('Comic Sans MS', 16)
 sun_count = 0
 suns = []
+projectiles = []
 selected_plant = None
 chosen_plants = ['plants:repeater', 'plants:sunflower']
 bottom_bar = BottomBar(chosen_plants)
-zombies = [[], [], [], [], [], [], []]
+zombies = []
 
 
 def tick(frame_number):
@@ -165,6 +214,10 @@ def tick(frame_number):
         sun.tick(frame_number)
     for plant in plants:
         plant.tick(frame_number)
+    for zombie in zombies:
+        zombie.tick(frame_number)
+    for projectile in projectiles:
+        projectile.tick(frame_number)
     bottom_bar.tick(frame_number)
 
 
@@ -177,6 +230,10 @@ def draw_screen(surface, frame_number):
         plant.draw(surface)
     for sun in suns:
         sun.draw(surface)
+    for zombie in zombies:
+        zombie.draw(surface)
+    for projectile in projectiles:
+        projectile.draw(surface)
 
     bottom_bar.draw(surface)
 
@@ -202,6 +259,10 @@ while run:
     for event in pg.event.get():
         if event.type == pg.QUIT:
             run = False
+
+        if event.type == pg.KEYDOWN:
+            if event.key == pg.K_z:
+                zombies.append(Zombie('zombies:basic', 640, random.randint(1, 8)*SCALE, frame))
 
     if pg.mouse.get_pressed()[0]:
         if selected_plant is not None:

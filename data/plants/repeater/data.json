@@ -3,5 +3,10 @@
   "health": 100,
   "sprite": "data/plants/repeater/sprite.png",
   "cost": 200,
-  "cooldown": 10
+  "cooldown": 10,
+  "attack_speed": 0.0025,
+  "attack": "projectiles.append(Bullet(self.x, self.y, self.data['projectile_speed'], self.data['damage'], 'projectiles:pea'))",
+  "projectile_speed": 2,
+  "burst": 2,
+  "damage": 15
 }
