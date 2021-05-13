@@ -83,7 +83,7 @@ class Plant:
         self.x = self.tile.x
         self.y = self.tile.y
         self.start_time = frame_num
-        self.lane = self.x / SCALE
+        self.lane = self.y / SCALE
 
         self.data = get_data(plant_id)
 
@@ -106,7 +106,10 @@ class Plant:
                     self.queue.remove(self.queue[0])
 
     def attack(self):
-        exec(str(self.data['attack']))
+        if type(self.data['attack']) == list:
+            exec(str("\n".join(self.data['attack'])))
+        else:
+            exec(str(self.data['attack']))
 
     def draw(self, surface):
         surface.blit(self.sprite, (int(self.x), int(self.y)))
