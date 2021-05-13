@@ -1,7 +1,8 @@
 {
   "id": "sunflower",
   "health": 100,
-  "sprite": "data/plants/sunflower/sprite.png",
+  "sprite": "data/plants/sunflower/sprite0.png",
+  "display_sprite": "data/plants/sunflower/sprite0.png",
   "cost": 50,
   "attack": "suns.append(Sun((self.x+16) + random.randint(-16, 17), (self.y+16) + random.randint(-16, 17), sunflower=True))",
   "attack_speed": 0.0015,

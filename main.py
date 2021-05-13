@@ -11,7 +11,7 @@ SCREEN_WIDTH = 11 * SCALE
 pg.font.init()
 window = pg.display.set_mode((SCREEN_HEIGHT, SCREEN_WIDTH), pg.SCALED)
 pg.display.set_caption('PVZ clone')
-pg.display.set_icon(pg.image.load('data/plants/repeater/sprite.png').convert_alpha())
+pg.display.set_icon(pg.image.load('data/plants/repeater/sprite0.png').convert_alpha())
 clock = pg.time.Clock()
 
 
@@ -112,6 +112,7 @@ class Plant:
         self.sprite = pg.image.load(get_data(self.id)['sprite']).convert_alpha()
         self.cost = self.data['cost']
         self.state = 0
+        self.countdown = 0
         self.queue = []
 
     def tick(self, frame_number):
@@ -196,7 +197,7 @@ class BottomBar:
                 {
                     'x': 1.25 * SCALE + items.index(item) * SCALE * 1.5,
                     'y': 9.5 * SCALE,
-                    'sprite': pg.image.load(get_data(item)['sprite']).convert_alpha(),
+                    'sprite': pg.image.load(get_data(item)['display_sprite']).convert_alpha(),
                     'cost': get_data(item)['cost'],
                     'id': item,
                     'cooldown': get_data(item)['starting_cooldown'],

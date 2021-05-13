@@ -1,13 +1,14 @@
 {
   "id": "patatomine",
   "health": 100,
-  "sprite": "data/plants/repeater/sprite.png",
+  "sprite": "data/plants/potatomine/sprite0.png",
+  "display_sprite": "data/plants/potatomine/sprite1.png",
   "cost": 25,
   "cooldown": 25,
   "attack_speed": null,
   "starting_cooldown": 5,
   "attack": [
-             "if self.state/60 >= 8:",
+             "if self.state == 1:",
              "    for zombie in zombies:",
              "        if zombie.lane == self.lane and pg.Rect(zombie.x, zombie.y, SCALE, SCALE*2).colliderect(pg.Rect(self.x, self.y, SCALE, SCALE)):",
              "            zombie.health -= self.data['damage']",
@@ -15,7 +16,10 @@
              "            self.tile.occupied = False"
             ],
   "tick": [
-    "self.state += 1",
+    "self.countdown += 1",
+    "if self.countdown/60 >= 8:",
+    "    self.state = 1",
+    "    self.sprite = pg.image.load(data/plants/potatomine/sprite1.png)",
     "self.attack()"
   ],
   "projectile_speed": 8,
