@@ -4,7 +4,7 @@
   "sprite": "data/plants/repeater/sprite.png",
   "cost": 200,
   "cooldown": 10,
-  "attack_speed": 0.0025,
+  "attack_speed": 0.005,
   "attack": [
              "count = 0",
              "for zombie in zombies:",
@@ -13,7 +13,7 @@
              "if count > 0:",
              "    projectiles.append(Bullet(self.x, self.y, self.data['projectile_speed'], self.data['damage'], 'projectiles:pea'))"
             ],
-  "projectile_speed": 2,
+  "projectile_speed": 8,
   "burst": 2,
-  "damage": 15
+  "damage": 20
 }

@@ -1,5 +1,4 @@
-import sys
-
+import time
 import pygame as pg
 import json
 import random
@@ -208,10 +207,11 @@ selected_plant = None
 chosen_plants = ['plants:repeater', 'plants:sunflower']
 bottom_bar = BottomBar(chosen_plants)
 zombies = []
+program_start_time = time.time()
 
 
 def tick(frame_number):
-    if random.randint(0, 500) == 1:
+    if random.randint(0, 400) == 1:
         suns.append(Sun(random.randint(0, 10 * SCALE), random.randint(SCALE, 8 * SCALE)))
     for sun in suns:
         sun.tick(frame_number)
@@ -222,6 +222,8 @@ def tick(frame_number):
     for projectile in projectiles:
         projectile.tick(frame_number)
     bottom_bar.tick(frame_number)
+    if time.time() - program_start_time > 45 and random.randint(0, 600) == 1:
+        zombies.append(Zombie('zombies:basic', SCALE*10, random.randint(1, 8)*SCALE, frame))
 
 
 def draw_screen(surface, frame_number):
