@@ -267,17 +267,15 @@ while run:
     if pg.mouse.get_pressed()[0]:
         if selected_plant is not None:
             for item in bottom_bar.items:
-                if item['id'] == selected_plant and item['cooldown'] <= 0:
-                    if sun_count >= get_data(selected_plant)['cost']:
-                        for tile in tiles:
-                            if not tile.occupied:
-                                if pg.Rect(tile.x, tile.y, SCALE, SCALE).collidepoint(pg.mouse.get_pos()):
-                                    tile.occupied = True
-                                    plants.append(Plant(selected_plant, tile, frame_num=frame))
-                                    sun_count -= get_data(selected_plant)['cost']
-                                    for item in bottom_bar.items:
-                                        if item['id'] == selected_plant:
-                                            item['cooldown'] = get_data(item['id'])['cooldown']
+                if item['id'] == selected_plant and item['cooldown'] <= 0 and sun_count >= get_data(selected_plant)['cost']:
+                    for tile in tiles:
+                        if not tile.occupied and pg.Rect(tile.x, tile.y, SCALE, SCALE).collidepoint(pg.mouse.get_pos()):
+                            tile.occupied = True
+                            plants.append(Plant(selected_plant, tile, frame_num=frame))
+                            sun_count -= get_data(selected_plant)['cost']
+                            for item in bottom_bar.items:
+                                if item['id'] == selected_plant:
+                                    item['cooldown'] = get_data(item['id'])['cooldown']
 
         for sun in suns:
             if pg.Rect(sun.x, sun.y, SCALE / 2, SCALE / 2).collidepoint(pg.mouse.get_pos()):
@@ -285,8 +283,7 @@ while run:
                 suns.remove(sun)
 
         for item in bottom_bar.items:
-            if pg.Rect(item['x'], item['y'], SCALE, SCALE).collidepoint(pg.mouse.get_pos()):
-                if selected_plant != item['id']:
+            if pg.Rect(item['x'], item['y'], SCALE, SCALE).collidepoint(pg.mouse.get_pos()) and selected_plant != item['id']:
                     selected_plant = item['id']
                     bottom_bar.selected = item['id']
 
@@ -297,10 +294,9 @@ while run:
                 plants.remove(plant)
 
         for item in bottom_bar.items:
-            if pg.Rect(item['x'], item['y'], SCALE, SCALE).collidepoint(pg.mouse.get_pos()):
-                if selected_plant == item['id']:
-                    selected_plant = None
-                    bottom_bar.selected = None
+            if pg.Rect(item['x'], item['y'], SCALE, SCALE).collidepoint(pg.mouse.get_pos()) and selected_plant == item['id']:
+                selected_plant = None
+                bottom_bar.selected = None
 
     frame += 1
 
