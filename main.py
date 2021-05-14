@@ -316,7 +316,10 @@ def tick(frame_number):
                     zombie_queue.append(key)
 
         if len(zombie_queue) > 0:
-            if random.randint(0, 2) == 1:
+            rate = int(800-(time.time() - cooldown_start_time))
+            if rate < 2:
+                rate = 2
+            if random.randint(0, rate) == 1:
                 zombie_choice = random.choice(zombie_queue)
                 zombies.append(Zombie(zombie_choice, 10*SCALE, random.randint(1, 8)*SCALE, frame))
                 zombie_queue.remove(zombie_choice)
