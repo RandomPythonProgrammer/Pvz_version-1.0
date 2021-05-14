@@ -1,13 +1,19 @@
+import sys
 import time
+import os
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame as pg
 import json
 import random
+
+import global_vars
 
 SCALE = 64
 FPS = 60
 SCREEN_HEIGHT = 11 * SCALE
 SCREEN_WIDTH = 11 * SCALE
 VOLUME = 1.2
+LANES = 7
 
 pg.font.init()
 pg.mixer.init()
@@ -30,7 +36,7 @@ eat_sound.set_volume(VOLUME)
 
 def get_data(full_id):
     item_type, item_id = full_id.split(':')
-    with open(f'data/{item_type}/{item_id}/data.json', 'r') as data_file:
+    with open('data/' + item_type + "/" + item_id + '/data.json', 'r') as data_file:
         return json.load(data_file)
 
 
@@ -52,6 +58,8 @@ class Bullet:
             pass
 
     def tick(self, frame_number):
+        if self.x > SCREEN_WIDTH:
+            projectiles.remove(self)
         if frame_number % 2 == 0:
             self.x += self.speed
             for zombie in zombies:
@@ -139,6 +147,7 @@ class Plant:
         self.y = self.tile.y
         self.start_time = frame_num
         self.lane = self.y / SCALE
+        self.time_starting = time.time()
 
         self.data = get_data(plant_id)
 
@@ -146,7 +155,6 @@ class Plant:
         self.sprite = pg.image.load(get_data(self.id)['sprite']).convert_alpha()
         self.cost = self.data['cost']
         self.state = 0
-        self.countdown = 0
         self.queue = []
 
     def tick(self, frame_number):
@@ -157,7 +165,8 @@ class Plant:
                 exec(self.data['tick'])
         except KeyError:
             try:
-                if (self.start_time - frame_number) % (1 / self.data['attack_speed']) == 0:
+                if int(time.time()) - int(self.time_starting) != 0 and (int(time.time()) - int(self.time_starting)) %\
+                        (self.data['attack_speed']) == 0 and frame_number % 60 == 0:
                     for i in range(self.data['burst']):
                         self.queue.append(self.attack)
                 if frame_number % 8 == 0:
@@ -211,7 +220,7 @@ class Tile:
         self.occupied = False
         self.species = random.randint(1, 4)
         self.version = version
-        self.sprite = pg.image.load(f'data/other/grass/grass{str(self.version)}-{str(self.species)}.png')
+        self.sprite = pg.image.load('data/other/grass/grass' + str(self.version) + '-' + str(self.species) + '.png')
 
     def draw(self, surface):
         surface.blit(self.sprite, (int(self.x), int(self.y)))
@@ -252,7 +261,7 @@ class BottomBar:
                 color = (255, 0, 0)
             else:
                 color = (0, 0, 0)
-            surface.blit(font.render(f"{item['cost']}", False, color), (item['x'], item['y'] + SCALE))
+            surface.blit(font.render(str(item['cost']), False, color), (item['x'], item['y'] + SCALE))
             if item['cooldown'] > 0:
                 overlay = pg.Surface((SCALE, SCALE))
                 overlay.set_alpha(100)
@@ -260,7 +269,7 @@ class BottomBar:
                 surface.blit(overlay, (item['x'], item['y']))
             if self.selected == item['id']:
                 surface.blit(self.selected_sprite, (item['x'], item['y']))
-        surface.blit(font.render(f'Sun: {sun_count}', False, (0, 0, 0)), (0, 9 * SCALE))
+        surface.blit(font.render('Sun: ' + str(sun_count), False, (0, 0, 0)), (0, 9 * SCALE))
 
 
 run = True
@@ -271,11 +280,11 @@ sun_count = 0
 suns = []
 projectiles = []
 selected_plant = None
-chosen_plants = ['plants:repeater', 'plants:sunflower', 'plants:potatomine', 'plants:walnut', 'plants:peashooter']
+chosen_plants = global_vars.get_var('plants')
 bottom_bar = BottomBar(chosen_plants)
 zombies = []
 cooldown_start_time = time.time()
-current_level = 'levels:1-1'
+current_level = global_vars.get_var('level')
 zombie_queue = []
 wave_mode = False
 waves = get_data(current_level)['waves']
@@ -308,15 +317,16 @@ def tick(frame_number):
         if zombie.wave:
             wave_zombie_count += 1
 
-    if time.time() - cooldown_start_time > 25 and not wave_mode:
+    if time.time() - cooldown_start_time > 30 and not wave_mode and len(waves) > 0:
         if len(zombie_queue) == 0 and wave_zombie_count == 0:
+            print("Start Roam")
             roam_zombies = level_data['roam_zombies']
             for key in list(roam_zombies.keys()):
                 for i in range(roam_zombies[key]):
                     zombie_queue.append(key)
 
         if len(zombie_queue) > 0:
-            rate = int(800-(time.time() - cooldown_start_time))
+            rate = int(1000 - 3*(time.time() - cooldown_start_time))
             if rate < 2:
                 rate = 2
             if random.randint(0, rate) == 1:
@@ -328,21 +338,23 @@ def tick(frame_number):
             wave_time = time.time()
 
     if wave_mode:
+        print("Start Wave")
         if time.time() - wave_time > 5:
             try:
                 wave = waves[0]
-            except IndexError:
-                print("win!!!!")
-                run = False
-            for key in list(wave.keys()):
-                for i in range(wave[key]):
-                    zombie_queue.append(key)
-            while len(zombie_queue) > 1:
-                zombie_choice = random.choice(zombie_queue)
-                zombies.append(Zombie(zombie_choice, 10 * SCALE, random.randint(1, 8) * SCALE, frame, wave=True))
-                zombie_queue.remove(zombie_choice)
-            waves.remove(wave)
-            wave_mode = False
+                for key in list(wave.keys()):
+                    for i in range(wave[key]):
+                        zombie_queue.append(key)
+                while len(zombie_queue) > 1:
+                    zombie_choice = random.choice(zombie_queue)
+                    zombies.append(Zombie(zombie_choice, 10 * SCALE, random.randint(1, 8) * SCALE, frame, wave=True))
+                    zombie_queue.remove(zombie_choice)
+                waves.remove(wave)
+                wave_mode = False
+            except:
+                if wave_zombie_count == 0:
+                    run = False
+                    global_vars.set_var("complete", True)
 
 
 def draw_screen(surface, frame_number):
@@ -354,8 +366,10 @@ def draw_screen(surface, frame_number):
         plant.draw(surface)
     for sun in suns:
         sun.draw(surface)
-    for zombie in zombies:
-        zombie.draw(surface)
+    for i in range(1, LANES+2):
+        for zombie in zombies:
+            if zombie.lane == i:
+                zombie.draw(surface)
     for projectile in projectiles:
         projectile.draw(surface)
 

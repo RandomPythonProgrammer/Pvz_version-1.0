@@ -4,8 +4,8 @@
   "sprite": "data/plants/peashooter/sprite0.png",
   "display_sprite": "data/plants/peashooter/sprite0.png",
   "cost": 100,
-  "cooldown": 10,
-  "attack_speed": 0.005,
+  "cooldown": 5,
+  "attack_speed": 3,
   "starting_cooldown": 5,
   "attack": [
              "count = 0",

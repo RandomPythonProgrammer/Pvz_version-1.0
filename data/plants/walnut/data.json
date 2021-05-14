@@ -1,6 +1,6 @@
 {
   "id": "walnut",
-  "health": 2500,
+  "health": 3500,
   "sprite": "data/plants/walnut/sprite0.png",
   "display_sprite": "data/plants/walnut/sprite0.png",
   "cost": 50,
