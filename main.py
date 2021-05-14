@@ -7,12 +7,25 @@ SCALE = 64
 FPS = 60
 SCREEN_HEIGHT = 11 * SCALE
 SCREEN_WIDTH = 11 * SCALE
+VOLUME = 1.2
 
 pg.font.init()
+pg.mixer.init()
 window = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pg.SCALED)
 pg.display.set_caption('PVZ clone')
 pg.display.set_icon(pg.image.load('data/plants/repeater/sprite0.png').convert_alpha())
 clock = pg.time.Clock()
+
+plant_sound = pg.mixer.Sound('data/other/grass/plant.mp3')
+plant_sound.set_volume(VOLUME)
+sun_pickup_sound = pg.mixer.Sound('data/other/sun/pickup.mp3')
+sun_pickup_sound.set_volume(VOLUME)
+select_sound = pg.mixer.Sound('data/other/menus/select.mp3')
+select_sound.set_volume(VOLUME)
+remove_sound = pg.mixer.Sound('data/other/grass/remove.mp3')
+remove_sound.set_volume(VOLUME)
+eat_sound = pg.mixer.Sound('data/zombies/other/eat.mp3')
+eat_sound.set_volume(VOLUME)
 
 
 def get_data(full_id):
@@ -22,13 +35,21 @@ def get_data(full_id):
 
 
 class Bullet:
-    def __init__(self, x, y, speed, damage, projectile_id):
+    def __init__(self, x, y, projectile_id):
         self.x = x
         self.y = y
-        self.speed = speed
-        self.damage = damage
+        self.data = get_data(projectile_id)
+        self.speed = self.data['projectile_speed']
+        self.damage = self.data['damage']
         self.lane = self.y / SCALE
-        self.sprite = pg.image.load(get_data(projectile_id)['sprite']).convert_alpha()
+        self.sprite = pg.image.load(self.data['sprite']).convert_alpha()
+        try:
+            self.hit_sound = pg.mixer.Sound(self.data['hit_sound'])
+            self.hit_sound.set_volume(VOLUME)
+            self.fire_sound = pg.mixer.Sound(self.data['fire_sound'])
+            self.fire_sound.set_volume(VOLUME)
+        except ValueError:
+            pass
 
     def tick(self, frame_number):
         if frame_number % 2 == 0:
@@ -37,7 +58,14 @@ class Bullet:
                 if zombie.lane == self.lane:
                     if pg.Rect(zombie.x, zombie.y, SCALE, SCALE).colliderect(pg.Rect(self.x, self.y, SCALE, SCALE)):
                         zombie.health -= self.damage
-                        projectiles.remove(self)
+                        try:
+                            self.hit_sound.play()
+                        except NameError:
+                            pass
+                        try:
+                            projectiles.remove(self)
+                        except ValueError:
+                            pass
             if self.x > SCREEN_WIDTH:
                 projectiles.remove(self)
 
@@ -46,12 +74,13 @@ class Bullet:
 
 
 class Zombie:
-    def __init__(self, zombie_id, x, y, frame_num):
+    def __init__(self, zombie_id, x, y, frame_num, wave=False):
         self.id = zombie_id
         self.x = x
         self.y = y
         self.start_time = frame_num
         self.lane = self.y / SCALE
+        self.wave = wave
 
         self.data = get_data(zombie_id)
 
@@ -73,13 +102,18 @@ class Zombie:
                 if self.x < 0:
                     print('lost')
                     zombies.remove(self)
-            if frame_number % 25 == 0 and self.eat is not None:
+            if (frame_number - self.start_time) % 50 == 0 and self.eat is not None:
                 self.eat.health -= self.damage
+                eat_sound.play()
                 if self.eat.health <= 0:
                     try:
                         plants.remove(self.eat)
+                        self.eat.tile.occupied = False
                     except ValueError:
-                        pass
+                        self.eat.tile.occupied = False
+                if self.eat not in plants:
+                    self.eat = None
+
                     self.eat = None
             if self.health <= 0:
                 zombies.remove(self)
@@ -214,7 +248,11 @@ class BottomBar:
         surface.blit(self.sprite, (self.x, self.y))
         for item in self.items:
             surface.blit(item['sprite'], (item['x'], item['y']))
-            surface.blit(font.render(f"Cost: {item['cost']}", False, (0, 0, 0)), (item['x'], item['y'] + SCALE))
+            if item['cost'] > sun_count:
+                color = (255, 0, 0)
+            else:
+                color = (0, 0, 0)
+            surface.blit(font.render(f"{item['cost']}", False, color), (item['x'], item['y'] + SCALE))
             if item['cooldown'] > 0:
                 overlay = pg.Surface((SCALE, SCALE))
                 overlay.set_alpha(100)
@@ -228,19 +266,31 @@ class BottomBar:
 run = True
 tiles = []
 plants = []
-font = pg.font.SysFont('Comic Sans MS', 16)
+font = pg.font.SysFont('Comic Sans MS', 16, bold=True)
 sun_count = 0
 suns = []
 projectiles = []
 selected_plant = None
-chosen_plants = ['plants:repeater', 'plants:sunflower', 'plants:potatomine', 'plants:walnut']
+chosen_plants = ['plants:repeater', 'plants:sunflower', 'plants:potatomine', 'plants:walnut', 'plants:peashooter']
 bottom_bar = BottomBar(chosen_plants)
 zombies = []
-program_start_time = time.time()
+cooldown_start_time = time.time()
+current_level = 'levels:1-1'
+zombie_queue = []
+wave_mode = False
+waves = get_data(current_level)['waves']
+wave_time = None
+level_data = get_data(current_level)
+game_start = False
 
 
 def tick(frame_number):
-    if random.randint(0, 350) == 1:
+    global level_data
+    global wave_mode
+    global wave_time
+    global game_start
+    global run
+    if random.randint(0, 450) == 1:
         suns.append(Sun(random.randint(0, 10 * SCALE), random.randint(SCALE, 8 * SCALE)))
     for sun in suns:
         sun.tick(frame_number)
@@ -251,16 +301,45 @@ def tick(frame_number):
     for projectile in projectiles:
         projectile.tick(frame_number)
     bottom_bar.tick(frame_number)
-    if time.time() - program_start_time > 20:
-        chance = int(1000 - (program_start_time - time.time())*2.5)
-        if chance <= 0:
-            chance = 1
-        if random.randint(0, chance) == 1:
-            if random.randint(1, 101) > 90:
-                for i in range(random.randint(3, 9)):
-                    zombies.append(Zombie('zombies:basic', SCALE*10, random.randint(1, 8)*SCALE, frame))
-            else:
-                zombies.append(Zombie('zombies:basic', SCALE * 10, random.randint(1, 8) * SCALE, frame))
+
+    wave_zombie_count = 0
+
+    for zombie in zombies:
+        if zombie.wave:
+            wave_zombie_count += 1
+
+    if time.time() - cooldown_start_time > 25 and not wave_mode:
+        if len(zombie_queue) == 0 and wave_zombie_count == 0:
+            roam_zombies = level_data['roam_zombies']
+            for key in list(roam_zombies.keys()):
+                for i in range(roam_zombies[key]):
+                    zombie_queue.append(key)
+
+        if len(zombie_queue) > 0:
+            if random.randint(0, 2) == 1:
+                zombie_choice = random.choice(zombie_queue)
+                zombies.append(Zombie(zombie_choice, 10*SCALE, random.randint(1, 8)*SCALE, frame))
+                zombie_queue.remove(zombie_choice)
+        if len(zombie_queue) == 0 and wave_zombie_count == 0:
+            wave_mode = True
+            wave_time = time.time()
+
+    if wave_mode:
+        if time.time() - wave_time > 5:
+            try:
+                wave = waves[0]
+            except IndexError:
+                print("win!!!!")
+                run = False
+            for key in list(wave.keys()):
+                for i in range(wave[key]):
+                    zombie_queue.append(key)
+            while len(zombie_queue) > 1:
+                zombie_choice = random.choice(zombie_queue)
+                zombies.append(Zombie(zombie_choice, 10 * SCALE, random.randint(1, 8) * SCALE, frame, wave=True))
+                zombie_queue.remove(zombie_choice)
+            waves.remove(wave)
+            wave_mode = False
 
 
 def draw_screen(surface, frame_number):
@@ -304,7 +383,12 @@ while run:
 
         if event.type == pg.KEYDOWN:
             if event.key == pg.K_z:
-                zombies.append(Zombie('zombies:basic', 640, random.randint(1, 8)*SCALE, frame))
+                zombies.append(Zombie('zombies:basic', 10*SCALE, random.randint(1, 8)*SCALE, frame))
+            if event.key == pg.K_s:
+                sun_count += 500
+            if event.key == pg.K_c:
+                for item in bottom_bar.items:
+                    item['cooldown'] = 0
 
     if pg.mouse.get_pressed()[0]:
         if selected_plant is not None:
@@ -320,22 +404,26 @@ while run:
                                     item['cooldown'] = get_data(item['id'])['cooldown']
                                     selected_plant = None
                                     bottom_bar.selected = None
+                            plant_sound.play()
 
         for sun in suns:
             if pg.Rect(sun.x, sun.y, SCALE / 2, SCALE / 2).collidepoint(pg.mouse.get_pos()):
                 sun_count += sun.value
                 suns.remove(sun)
+                sun_pickup_sound.play()
 
         for item in bottom_bar.items:
             if pg.Rect(item['x'], item['y'], SCALE, SCALE).collidepoint(pg.mouse.get_pos()) and selected_plant != item['id']:
                     selected_plant = item['id']
                     bottom_bar.selected = item['id']
+                    select_sound.play()
 
     if pg.mouse.get_pressed()[2]:
         for plant in plants:
             if pg.Rect(plant.x, plant.y, SCALE, SCALE).collidepoint(pg.mouse.get_pos()):
                 plant.tile.occupied = False
                 plants.remove(plant)
+                remove_sound.play()
 
         for item in bottom_bar.items:
             if pg.Rect(item['x'], item['y'], SCALE, SCALE).collidepoint(pg.mouse.get_pos()) and selected_plant == item['id']:

@@ -1,3 +1,7 @@
 {
-  "sprite": "data/projectiles/pea/sprite.png"
+  "sprite": "data/projectiles/pea/sprite.png",
+  "projectile_speed": 8,
+  "damage": 20,
+  "fire_sound": "data/projectiles/pea/fire.mp3",
+  "hit_sound": "data/projectiles/pea/hit.mp3"
 }

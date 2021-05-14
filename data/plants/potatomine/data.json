@@ -13,7 +13,8 @@
              "        if zombie.lane == self.lane and pg.Rect(zombie.x, zombie.y, SCALE, SCALE*2).colliderect(pg.Rect(self.x, self.y, SCALE, SCALE)):",
              "            zombie.health -= self.data['damage']",
              "            plants.remove(self)",
-             "            self.tile.occupied = False"
+             "            self.tile.occupied = False",
+             "            pg.mixer.Sound('data/plants/potatomine/explode.mp3').play()"
             ],
   "tick": [
     "self.countdown += 1",

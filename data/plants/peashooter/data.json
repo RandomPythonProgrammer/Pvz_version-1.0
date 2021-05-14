@@ -1,9 +1,9 @@
 {
-  "id": "repeater",
+  "id": "peashooter",
   "health": 100,
-  "sprite": "data/plants/repeater/sprite0.png",
-  "display_sprite": "data/plants/repeater/sprite0.png",
-  "cost": 200,
+  "sprite": "data/plants/peashooter/sprite0.png",
+  "display_sprite": "data/plants/peashooter/sprite0.png",
+  "cost": 100,
   "cooldown": 10,
   "attack_speed": 0.005,
   "starting_cooldown": 5,
@@ -15,5 +15,5 @@
              "if count > 0:",
              "    projectiles.append(Bullet(self.x, self.y, 'projectiles:pea'))"
             ],
-  "burst": 2
+  "burst": 1
 }

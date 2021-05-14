@@ -1,0 +1,7 @@
+{
+  "id": "buckethead",
+  "speed": 0.75,
+  "health": 650,
+  "sprite": "data/zombies/buckethead/sprite0.png",
+  "damage": 20
+}

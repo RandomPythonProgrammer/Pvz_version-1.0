@@ -1,0 +1,7 @@
+{
+  "id": "basic",
+  "speed": 0.75,
+  "health": 350,
+  "sprite": "data/zombies/conehead/sprite0.png",
+  "damage": 20
+}
