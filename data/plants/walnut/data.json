@@ -1,9 +1,9 @@
 {
   "id": "walnut",
-  "health": 3500,
+  "health": 2500,
   "sprite": "data/plants/walnut/sprite0.png",
   "display_sprite": "data/plants/walnut/sprite0.png",
   "cost": 50,
-  "cooldown": 35,
+  "cooldown": 25,
   "starting_cooldown": 10
 }

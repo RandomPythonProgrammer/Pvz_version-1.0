@@ -54,6 +54,7 @@ class Bullet:
             self.hit_sound.set_volume(VOLUME)
             self.fire_sound = pg.mixer.Sound(self.data['fire_sound'])
             self.fire_sound.set_volume(VOLUME)
+            self.fire_sound.play()
         except ValueError:
             pass
 
@@ -97,6 +98,8 @@ class Zombie:
         self.speed = self.data['speed']
         self.eat = None
         self.damage = self.data['damage']
+        self.state = 0
+        self.cooldown = 0
 
     def tick(self, frame_number):
         try:
@@ -105,29 +108,33 @@ class Zombie:
             else:
                 exec(self.data['tick'])
         except KeyError:
-            if frame_number % 3 == 0 and self.eat is None:
-                self.x -= self.speed
-                if self.x < 0:
-                    print('lost')
-                    zombies.remove(self)
-            if (frame_number - self.start_time) % 50 == 0 and self.eat is not None:
-                self.eat.health -= self.damage
-                eat_sound.play()
-                if self.eat.health <= 0:
-                    try:
-                        plants.remove(self.eat)
-                        self.eat.tile.occupied = False
-                    except ValueError:
-                        self.eat.tile.occupied = False
-                if self.eat not in plants:
-                    self.eat = None
+            self.default_tick(frame_number)
 
-                    self.eat = None
-            if self.health <= 0:
+    def default_tick(self, frame_number):
+        if frame_number % 3 == 0 and self.eat is None:
+            self.x -= self.speed
+            if self.x < 0:
+                print('lost')
                 zombies.remove(self)
-            for plant in plants:
-                if pg.Rect(plant.x, plant.y, SCALE, SCALE).colliderect(pg.Rect(self.x, self.y, SCALE, SCALE*2)) and self.lane == plant.lane:
-                    self.eat = plant
+        if (frame_number - self.start_time) % 50 == 0 and self.eat is not None:
+            self.eat.health -= self.damage
+            eat_sound.play()
+            if self.eat.health <= 0:
+                try:
+                    plants.remove(self.eat)
+                    self.eat.tile.occupied = False
+                except ValueError:
+                    self.eat.tile.occupied = False
+            if self.eat not in plants:
+                self.eat = None
+
+                self.eat = None
+        if self.health <= 0:
+            zombies.remove(self)
+        for plant in plants:
+            if pg.Rect(plant.x, plant.y, SCALE, SCALE).colliderect(
+                    pg.Rect(self.x, self.y, SCALE, SCALE * 2)) and self.lane == plant.lane:
+                self.eat = plant
 
     def attack(self):
         if type(self.data['attack']) == list:
@@ -164,17 +171,20 @@ class Plant:
             else:
                 exec(self.data['tick'])
         except KeyError:
-            try:
-                if int(time.time()) - int(self.time_starting) != 0 and (int(time.time()) - int(self.time_starting)) %\
-                        (self.data['attack_speed']) == 0 and frame_number % 60 == 0:
-                    for i in range(self.data['burst']):
-                        self.queue.append(self.attack)
-                if frame_number % 8 == 0:
-                    if len(self.queue) > 0:
-                        self.queue[0]()
-                        self.queue.remove(self.queue[0])
-            except KeyError:
-                pass
+            self.default_tick(frame_number)
+
+    def default_tick(self, frame_number):
+        try:
+            if int(time.time()) - int(self.time_starting) != 0 and (int(time.time()) - int(self.time_starting)) %\
+                    (self.data['attack_speed']) == 0 and frame_number % 60 == 0:
+                for i in range(self.data['burst']):
+                    self.queue.append(self.attack)
+            if frame_number % 8 == 0:
+                if len(self.queue) > 0:
+                    self.queue[0]()
+                    self.queue.remove(self.queue[0])
+        except KeyError:
+            pass
 
     def attack(self):
         if type(self.data['attack']) == list:
@@ -291,12 +301,15 @@ waves = get_data(current_level)['waves']
 wave_time = None
 level_data = get_data(current_level)
 game_start = False
+cooldown = 30
 
 
 def tick(frame_number):
+    global cooldown_start_time
     global level_data
     global wave_mode
     global wave_time
+    global cooldown
     global game_start
     global run
     if random.randint(0, 450) == 1:
@@ -317,7 +330,7 @@ def tick(frame_number):
         if zombie.wave:
             wave_zombie_count += 1
 
-    if time.time() - cooldown_start_time > 30 and not wave_mode and len(waves) > 0:
+    if time.time() - cooldown_start_time > cooldown and not wave_mode and len(waves) > 0:
         if len(zombie_queue) == 0 and wave_zombie_count == 0:
             print("Start Roam")
             roam_zombies = level_data['roam_zombies']
@@ -326,35 +339,35 @@ def tick(frame_number):
                     zombie_queue.append(key)
 
         if len(zombie_queue) > 0:
-            rate = int(1000 - 3*(time.time() - cooldown_start_time))
+            rate = int(1000 - 4*(time.time() - cooldown_start_time))
             if rate < 2:
                 rate = 2
             if random.randint(0, rate) == 1:
                 zombie_choice = random.choice(zombie_queue)
                 zombies.append(Zombie(zombie_choice, 10*SCALE, random.randint(1, 8)*SCALE, frame))
                 zombie_queue.remove(zombie_choice)
-        if len(zombie_queue) == 0 and wave_zombie_count == 0:
+        if len(zombie_queue) == 0 and wave_zombie_count == 0 and time.time() - cooldown_start_time > 5:
             wave_mode = True
             wave_time = time.time()
 
+    if len(waves) == 0 and wave_zombie_count == 0:
+        run = False
+        global_vars.set_var("complete", True)
+
     if wave_mode:
         print("Start Wave")
-        if time.time() - wave_time > 5:
-            try:
-                wave = waves[0]
-                for key in list(wave.keys()):
-                    for i in range(wave[key]):
-                        zombie_queue.append(key)
-                while len(zombie_queue) > 1:
-                    zombie_choice = random.choice(zombie_queue)
-                    zombies.append(Zombie(zombie_choice, 10 * SCALE, random.randint(1, 8) * SCALE, frame, wave=True))
-                    zombie_queue.remove(zombie_choice)
-                waves.remove(wave)
-                wave_mode = False
-            except:
-                if wave_zombie_count == 0:
-                    run = False
-                    global_vars.set_var("complete", True)
+        wave = waves[0]
+        for key in list(wave.keys()):
+            for i in range(wave[key]):
+                zombie_queue.append(key)
+        while len(zombie_queue) > 1:
+            zombie_choice = random.choice(zombie_queue)
+            zombies.append(Zombie(zombie_choice, 10 * SCALE, random.randint(1, 8) * SCALE, frame, wave=True))
+            zombie_queue.remove(zombie_choice)
+        waves.remove(wave)
+        wave_mode = False
+        cooldown = 5
+        cooldown_start_time = time.time()
 
 
 def draw_screen(surface, frame_number):
@@ -400,12 +413,15 @@ while run:
 
         if event.type == pg.KEYDOWN:
             if event.key == pg.K_z:
-                zombies.append(Zombie('zombies:basic', 10*SCALE, random.randint(1, 8)*SCALE, frame))
+                zombies.append(Zombie('zombies:polevault', 10*SCALE, random.randint(1, 8)*SCALE, frame))
             if event.key == pg.K_s:
                 sun_count += 500
             if event.key == pg.K_c:
                 for item in bottom_bar.items:
                     item['cooldown'] = 0
+            if event.key == pg.K_v:
+                run = False
+                global_vars.set_var("complete", True)
 
     if pg.mouse.get_pressed()[0]:
         if selected_plant is not None:

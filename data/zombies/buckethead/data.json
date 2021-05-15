@@ -1,6 +1,6 @@
 {
   "id": "buckethead",
-  "speed": 0.75,
+  "speed": 0.5,
   "health": 750,
   "sprite": "data/zombies/buckethead/sprite0.png",
   "damage": 20

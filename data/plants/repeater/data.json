@@ -4,7 +4,7 @@
   "sprite": "data/plants/repeater/sprite0.png",
   "display_sprite": "data/plants/repeater/sprite0.png",
   "cost": 200,
-  "cooldown": 10,
+  "cooldown": 5,
   "attack_speed": 3,
   "starting_cooldown": 5,
   "attack": [

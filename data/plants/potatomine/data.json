@@ -22,7 +22,7 @@
   "tick": [
     "if time.time() - self.time_starting > 12 and self.state == 0:",
     "    self.state = 1",
-    "    self.sprite = pg.image.load('data/plants/potatomine/sprite1.png')",
+    "    self.sprite = pg.image.load('data/plants/potatomine/sprite1.png').convert_alpha()",
     "self.attack()"
   ],
   "projectile_speed": 8,
