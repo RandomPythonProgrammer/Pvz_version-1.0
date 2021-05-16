@@ -3,11 +3,11 @@ import global_vars
 global_vars.set_var('level', 'locations/' + input('level: '))
 global_vars.set_var(
     'plants', [
-        'plants:sunflower',
+        'plants:walnut',
         'plants:peashooter',
         'plants:repeater',
-        'plants:walnut',
-        'plants:potatomine',
+        'plants:sunshroom',
+        'plants:scaredyshroom',
         'plants:puffshroom'
     ]
 )

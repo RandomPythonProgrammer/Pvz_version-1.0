@@ -17,7 +17,7 @@
              "        projectiles.append(Bullet(self.x, self.y, 'projectiles:spore'))",
              "count = 0",
              "for zombie in zombies:",
-             "    if zombie.lane == self.lane and zombie.x - self.x < 4*SCALE:",
+             "    if zombie.lane == self.lane and zombie.x - self.x < 3*SCALE:",
              "      count += 1",
              "if count > 0 and self.state == 0:",
              "    self.state = 1",

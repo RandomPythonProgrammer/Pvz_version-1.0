@@ -250,9 +250,8 @@ class Plant:
 
 
 class Sun:
-    def __init__(self, x, y, value=25, sunflower=False):
+    def __init__(self, x, y, value=25, sunflower=False,):
         self.x = x
-
         if not sunflower:
             self.dest_y = y
             self.y = 0
@@ -410,8 +409,8 @@ def tick(frame_number):
 
         if len(zombie_queue) > 0:
             rate = int(chance - 5*(time.time() - cooldown_start_time))
-            if rate < 70:
-                rate = 70
+            if rate < 100:
+                rate = 100
             if random.randint(0, rate) == 1:
                 zombie_choice = random.choice(zombie_queue)
                 zombies.append(Zombie(zombie_choice, 10*SCALE, random.randint(1, 8)*SCALE, frame))

@@ -1,0 +1,24 @@
+{
+  "id": "sunshroom",
+  "health": 100,
+  "sprite": "data/plants/peashooter/sprite0.png",
+  "display_sprite": "data/plants/peashooter/sprite0.png",
+  "cost": 25,
+  "attack": [
+    "if location_data['time'] == 'night':",
+    "    if self.state == 0:",
+    "        suns.append(Sun((self.x+16) + random.randint(-16, 17), (self.y+16) + random.randint(-16, 17), sunflower=True, value=15))",
+    "    else:",
+    "        suns.append(Sun((self.x+16) + random.randint(-16, 17), (self.y+16) + random.randint(-16, 17), sunflower=True, value=25))"
+  ],
+  "tick": [
+    "if time.time() - self.time_starting > 120 and self.state == 0:",
+    "    self.state = 1",
+    "    self.sprite = pg.image.load('data/plants/repeater/sprite0.png')",
+    "self.default_tick(frame_number)"
+  ],
+  "attack_speed": 6.5,
+  "cooldown": 3,
+  "burst": 1,
+  "starting_cooldown": 3
+}
