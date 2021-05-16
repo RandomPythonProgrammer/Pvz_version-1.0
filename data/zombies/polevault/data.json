@@ -1,7 +1,7 @@
 {
   "id": "polevault",
   "speed": 1.5,
-  "health": 100,
+  "health": 125,
   "sprite": "data/zombies/polevault/sprite0.png",
   "damage": 20,
   "tick": [

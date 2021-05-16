@@ -17,7 +17,7 @@
              "            except ValueError:",
              "                pass",
              "            self.tile.occupied = False",
-             "            pg.mixer.Sound('data/plants/potatomine/explode.mp3').play()"
+             "            Sound('sounds:explode').play()"
             ],
   "tick": [
     "if time.time() - self.time_starting > 12 and self.state == 0:",

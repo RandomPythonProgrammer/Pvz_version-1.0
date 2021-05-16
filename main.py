@@ -1,11 +1,9 @@
-import sys
 import time
 import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame as pg
 import json
 import random
-
 import global_vars
 
 SCALE = 64
@@ -14,6 +12,7 @@ SCREEN_HEIGHT = 11 * SCALE
 SCREEN_WIDTH = 11 * SCALE
 VOLUME = 1.2
 LANES = 7
+DEBUG = False
 
 pg.font.init()
 pg.mixer.init()
@@ -22,22 +21,34 @@ pg.display.set_caption('PVZ clone')
 pg.display.set_icon(pg.image.load('data/plants/repeater/sprite0.png').convert_alpha())
 clock = pg.time.Clock()
 
-plant_sound = pg.mixer.Sound('data/other/grass/plant.mp3')
-plant_sound.set_volume(VOLUME)
-sun_pickup_sound = pg.mixer.Sound('data/other/sun/pickup.mp3')
-sun_pickup_sound.set_volume(VOLUME)
-select_sound = pg.mixer.Sound('data/other/menus/select.mp3')
-select_sound.set_volume(VOLUME)
-remove_sound = pg.mixer.Sound('data/other/grass/remove.mp3')
-remove_sound.set_volume(VOLUME)
-eat_sound = pg.mixer.Sound('data/zombies/other/eat.mp3')
-eat_sound.set_volume(VOLUME)
+# roam_music = pg.mixer.Sound('data/other/')
+# wave_music = pg.mixer.Sound('data/other/')
 
 
 def get_data(full_id):
     item_type, item_id = full_id.split(':')
     with open('data/' + item_type + "/" + item_id + '/data.json', 'r') as data_file:
         return json.load(data_file)
+
+
+def get_image(full_id):
+    item_type, item_id = full_id.split(':')
+    return str('data/' + item_type + "/" + item_id + '.png')
+
+
+def get_sound(full_id):
+    item_type, item_id = full_id.split(':')
+    return str('data/' + item_type + "/" + item_id + '.mp3')
+
+
+class Drawable:
+    def __init__(self, image_source, location, drawable_id):
+        self.location = location
+        self.image = pg.image.load(image_source).convert_alpha()
+        self.id = drawable_id
+
+    def draw(self, surface):
+        surface.blit(self.image, self.location)
 
 
 class Bullet:
@@ -50,11 +61,8 @@ class Bullet:
         self.lane = self.y / SCALE
         self.sprite = pg.image.load(self.data['sprite']).convert_alpha()
         try:
-            self.hit_sound = pg.mixer.Sound(self.data['hit_sound'])
-            self.hit_sound.set_volume(VOLUME)
-            self.fire_sound = pg.mixer.Sound(self.data['fire_sound'])
-            self.fire_sound.set_volume(VOLUME)
-            self.fire_sound.play()
+            self.hit_sound = Sound(self.data['hit_sound'])
+            Sound(self.data['fire_sound']).play()
         except ValueError:
             pass
 
@@ -111,14 +119,17 @@ class Zombie:
             self.default_tick(frame_number)
 
     def default_tick(self, frame_number):
+        global run
         if frame_number % 3 == 0 and self.eat is None:
             self.x -= self.speed
             if self.x < 0:
                 print('lost')
+                if not DEBUG:
+                    run = False
                 zombies.remove(self)
         if (frame_number - self.start_time) % 50 == 0 and self.eat is not None:
             self.eat.health -= self.damage
-            eat_sound.play()
+            Sound('sounds:eat').play()
             if self.eat.health <= 0:
                 try:
                     plants.remove(self.eat)
@@ -223,6 +234,16 @@ class Sun:
             suns.remove(self)
 
 
+class Sound:
+    def __init__(self, sound_id):
+        self.source = get_sound(sound_id)
+        self.sound = pg.mixer.Sound(self.source)
+        self.sound.set_volume(VOLUME)
+
+    def play(self):
+        self.sound.play()
+
+
 class Tile:
     def __init__(self, x, y, version):
         self.x = x
@@ -302,17 +323,20 @@ wave_time = None
 level_data = get_data(current_level)
 game_start = False
 cooldown = 30
+drawables = []
+chance = 1500
 
 
 def tick(frame_number):
     global cooldown_start_time
+    global chance
     global level_data
     global wave_mode
     global wave_time
     global cooldown
     global game_start
     global run
-    if random.randint(0, 450) == 1:
+    if random.randint(0, 400) == 1:
         suns.append(Sun(random.randint(0, 10 * SCALE), random.randint(SCALE, 8 * SCALE)))
     for sun in suns:
         sun.tick(frame_number)
@@ -333,34 +357,53 @@ def tick(frame_number):
     if time.time() - cooldown_start_time > cooldown and not wave_mode and len(waves) > 0:
         if len(zombie_queue) == 0 and wave_zombie_count == 0:
             print("Start Roam")
+            pg.mixer.fadeout(4)
+            Sound('sounds:main_theme').play()
             roam_zombies = level_data['roam_zombies']
             for key in list(roam_zombies.keys()):
                 for i in range(roam_zombies[key]):
                     zombie_queue.append(key)
 
         if len(zombie_queue) > 0:
-            rate = int(1000 - 4*(time.time() - cooldown_start_time))
-            if rate < 2:
-                rate = 2
+            rate = int(chance - 10*(time.time() - cooldown_start_time))
+            if rate < 100:
+                rate = 100
             if random.randint(0, rate) == 1:
                 zombie_choice = random.choice(zombie_queue)
                 zombies.append(Zombie(zombie_choice, 10*SCALE, random.randint(1, 8)*SCALE, frame))
                 zombie_queue.remove(zombie_choice)
-        if len(zombie_queue) == 0 and wave_zombie_count == 0 and time.time() - cooldown_start_time > 5:
-            wave_mode = True
-            wave_time = time.time()
+        if len(zombie_queue) == 0 and wave_zombie_count == 0 and wave_time is None:
+            count = 0
+            for drawable in drawables:
+                if drawable.id == 'wave':
+                    count += 1
+            if count == 0:
+                drawables.append(Drawable(
+                    image_source='data/other/menus/wave.png',
+                    location=(0, 0),
+                    drawable_id='wave',
+                 )
+                )
+
+                wave_mode = True
+                wave_time = time.time()
+                pg.mixer.fadeout(4)
 
     if len(waves) == 0 and wave_zombie_count == 0:
         run = False
         global_vars.set_var("complete", True)
 
-    if wave_mode:
+    if wave_mode and time.time() - wave_time > 5:
+        Sound('sounds:wave_theme').play()
+        for drawable in drawables:
+            if drawable.id == 'wave':
+                drawables.remove(drawable)
         print("Start Wave")
         wave = waves[0]
         for key in list(wave.keys()):
             for i in range(wave[key]):
                 zombie_queue.append(key)
-        while len(zombie_queue) > 1:
+        while len(zombie_queue) > 0:
             zombie_choice = random.choice(zombie_queue)
             zombies.append(Zombie(zombie_choice, 10 * SCALE, random.randint(1, 8) * SCALE, frame, wave=True))
             zombie_queue.remove(zombie_choice)
@@ -368,6 +411,8 @@ def tick(frame_number):
         wave_mode = False
         cooldown = 5
         cooldown_start_time = time.time()
+        wave_time = None
+        chance = 800
 
 
 def draw_screen(surface, frame_number):
@@ -385,6 +430,8 @@ def draw_screen(surface, frame_number):
                 zombie.draw(surface)
     for projectile in projectiles:
         projectile.draw(surface)
+    for drawable in drawables:
+        drawable.draw(surface)
 
     bottom_bar.draw(surface)
 
@@ -411,7 +458,7 @@ while run:
         if event.type == pg.QUIT:
             run = False
 
-        if event.type == pg.KEYDOWN:
+        if event.type == pg.KEYDOWN and DEBUG:
             if event.key == pg.K_z:
                 zombies.append(Zombie('zombies:polevault', 10*SCALE, random.randint(1, 8)*SCALE, frame))
             if event.key == pg.K_s:
@@ -437,26 +484,26 @@ while run:
                                     item['cooldown'] = get_data(item['id'])['cooldown']
                                     selected_plant = None
                                     bottom_bar.selected = None
-                            plant_sound.play()
+                            Sound('sounds:plant').play()
 
         for sun in suns:
             if pg.Rect(sun.x, sun.y, SCALE / 2, SCALE / 2).collidepoint(pg.mouse.get_pos()):
                 sun_count += sun.value
                 suns.remove(sun)
-                sun_pickup_sound.play()
+                Sound('sounds:pickup').play()
 
         for item in bottom_bar.items:
             if pg.Rect(item['x'], item['y'], SCALE, SCALE).collidepoint(pg.mouse.get_pos()) and selected_plant != item['id']:
                     selected_plant = item['id']
                     bottom_bar.selected = item['id']
-                    select_sound.play()
+                    Sound('sounds:select').play()
 
     if pg.mouse.get_pressed()[2]:
         for plant in plants:
             if pg.Rect(plant.x, plant.y, SCALE, SCALE).collidepoint(pg.mouse.get_pos()):
                 plant.tile.occupied = False
                 plants.remove(plant)
-                remove_sound.play()
+                Sound('sounds:remove').play()
 
         for item in bottom_bar.items:
             if pg.Rect(item['x'], item['y'], SCALE, SCALE).collidepoint(pg.mouse.get_pos()) and selected_plant == item['id']:
