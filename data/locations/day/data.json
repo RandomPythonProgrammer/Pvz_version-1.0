@@ -1,7 +1,8 @@
 {
-  "cooldown": 30,
-  "chance": 1500,
-  "sun_rate": 400,
+  "cooldown": 20,
+  "chance": 800,
+  "sun_rate": 380,
   "tiles": "data/locations/day/images",
-  "background": [150, 150, 255]
+  "background": [150, 150, 255],
+  "time": "day"
 }

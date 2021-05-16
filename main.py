@@ -12,7 +12,7 @@ SCREEN_HEIGHT = 11 * SCALE
 SCREEN_WIDTH = 11 * SCALE
 VOLUME = 1.2
 LANES = 7
-DEBUG = False
+DEBUG = True
 
 pg.font.init()
 pg.mixer.init()
@@ -47,12 +47,15 @@ class Drawable:
 
 
 class Bullet:
-    def __init__(self, x, y, projectile_id):
+    def __init__(self, x, y, projectile_id, damage=None):
         self.x = x
         self.y = y
         self.data = get_data(projectile_id)
         self.speed = self.data['projectile_speed']
-        self.damage = self.data['damage']
+        if damage is not None:
+            self.damage = damage
+        else:
+            self.damage = self.data['damage']
         self.lane = self.y / SCALE
         self.sprite = pg.image.load(self.data['sprite']).convert_alpha()
         try:
@@ -69,7 +72,7 @@ class Bullet:
             for zombie in zombies:
                 if zombie.lane == self.lane:
                     if pg.Rect(zombie.x, zombie.y, SCALE, SCALE).colliderect(pg.Rect(self.x, self.y, SCALE, SCALE)):
-                        zombie.health -= self.damage
+                        zombie.shield -= self.damage
                         try:
                             self.hit_sound.play()
                         except NameError:
@@ -80,6 +83,37 @@ class Bullet:
                             pass
             if self.x > SCREEN_WIDTH:
                 projectiles.remove(self)
+
+    def draw(self, surface):
+        surface.blit(self.sprite, (self.x, self.y))
+
+
+class Fume:
+    def __init__(self, x, y, projectile_id):
+        self.x = x
+        self.y = y
+        self.data = get_data(projectile_id)
+        self.damage = self.data['damage']
+        self.lane = self.y / SCALE
+        self.sprite = pg.image.load(self.data['sprite']).convert_alpha()
+        try:
+            self.hit_sound = Sound(self.data['hit_sound'])
+            Sound(self.data['fire_sound']).play()
+        except ValueError:
+            pass
+        self.start_time = time.time()
+        for zombie in zombies:
+            if zombie.lane == self.lane:
+                if pg.Rect(zombie.x, zombie.y, SCALE, SCALE).colliderect(pg.Rect(self.x, self.y, SCALE, SCALE)):
+                    zombie.health -= self.damage
+                    try:
+                        self.hit_sound.play()
+                    except NameError:
+                        pass
+
+    def tick(self, frame_number):
+        if time.time() - self.start_time > 1.5:
+            projectiles.remove(self)
 
     def draw(self, surface):
         surface.blit(self.sprite, (self.x, self.y))
@@ -103,6 +137,10 @@ class Zombie:
         self.damage = self.data['damage']
         self.state = 0
         self.cooldown = 0
+        try:
+            self.shield = self.data['shield']
+        except KeyError:
+            self.shield = 0
 
     def tick(self, frame_number):
         try:
@@ -115,6 +153,9 @@ class Zombie:
 
     def default_tick(self, frame_number):
         global run
+        if self.shield < 0:
+            self.health -= abs(self.shield)
+            self.shield = 0
         if frame_number % 3 == 0 and self.eat is None:
             self.x -= self.speed
             if self.x < 0:
@@ -134,7 +175,6 @@ class Zombie:
             if self.eat not in plants:
                 self.eat = None
 
-                self.eat = None
         if self.health <= 0:
             zombies.remove(self)
         for plant in plants:
@@ -246,7 +286,7 @@ class Tile:
         self.occupied = False
         self.species = random.randint(1, 4)
         self.version = version
-        self.sprite = pg.image.load(get_data('/'.join(current_level.split(':')[:-1]))['tiles'] + '/' + "tile" + str(self.version) + '-' + str(self.species) + '.png')
+        self.sprite = pg.image.load(location_data['tiles'] + '/' + "tile" + str(self.version) + '-' + str(self.species) + '.png')
 
     def draw(self, surface):
         surface.blit(self.sprite, (int(self.x), int(self.y)))
@@ -302,7 +342,7 @@ run = True
 tiles = []
 plants = []
 font = pg.font.SysFont('Comic Sans MS', 16, bold=True)
-sun_count = 0
+sun_count = 50
 suns = []
 projectiles = []
 selected_plant = None
@@ -318,9 +358,10 @@ wave_time = None
 level_data = get_data(current_level)
 game_start = False
 drawables = []
-cooldown = get_data('/'.join(current_level.split(':')[:-1]))['cooldown']
-chance = get_data('/'.join(current_level.split(':')[:-1]))['chance']
-sun_rate = get_data('/'.join(current_level.split(':')[:-1]))['sun_rate']
+location_data = get_data('/'.join(current_level.split(':')[:-1]))
+cooldown = location_data['cooldown']
+chance = location_data['chance']
+sun_rate = location_data['sun_rate']
 
 
 def tick(frame_number):
@@ -361,9 +402,9 @@ def tick(frame_number):
                     zombie_queue.append(key)
 
         if len(zombie_queue) > 0:
-            rate = int(chance - 10*(time.time() - cooldown_start_time))
-            if rate < 100:
-                rate = 100
+            rate = int(chance - 5*(time.time() - cooldown_start_time))
+            if rate < 70:
+                rate = 70
             if random.randint(0, rate) == 1:
                 zombie_choice = random.choice(zombie_queue)
                 zombies.append(Zombie(zombie_choice, 10*SCALE, random.randint(1, 8)*SCALE, frame))
@@ -412,7 +453,7 @@ def tick(frame_number):
 
 
 def draw_screen(surface, frame_number):
-    surface.fill(get_data('/'.join(current_level.split(':')[:-1]))['background'])
+    surface.fill(location_data['background'])
 
     for tile in tiles:
         tile.draw(surface)

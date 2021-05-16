@@ -8,6 +8,7 @@ global_vars.set_var(
         'plants:repeater',
         'plants:walnut',
         'plants:potatomine',
+        'plants:puffshroom'
     ]
 )
 import main

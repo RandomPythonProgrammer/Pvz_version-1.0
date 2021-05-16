@@ -17,8 +17,8 @@
 
   ],
   "roam_zombies": {
-    "zombies:basic": 12,
-    "zombies:conehead": 5,
-    "zombies:buckethead": 2
+    "zombies:basic": 30,
+    "zombies:conehead": 12,
+    "zombies:buckethead": 4
   }
 }

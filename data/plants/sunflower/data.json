@@ -5,8 +5,8 @@
   "display_sprite": "data/plants/sunflower/sprite0.png",
   "cost": 50,
   "attack": "suns.append(Sun((self.x+16) + random.randint(-16, 17), (self.y+16) + random.randint(-16, 17), sunflower=True))",
-  "attack_speed": 10,
-  "cooldown": 5,
+  "attack_speed": 8.5,
+  "cooldown": 3,
   "burst": 1,
-  "starting_cooldown": 5
+  "starting_cooldown": 3
 }

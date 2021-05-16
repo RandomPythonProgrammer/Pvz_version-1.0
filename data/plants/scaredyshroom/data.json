@@ -1,0 +1,31 @@
+{
+  "id": "scaredyshroom",
+  "health": 100,
+  "sprite": "data/plants/scaredyshroom/sprite0.png",
+  "display_sprite": "data/plants/scaredyshroom/sprite0.png",
+  "cost": 25,
+  "cooldown": 3,
+  "attack_speed": 1.5,
+  "starting_cooldown": 3,
+  "attack": [
+             "if location_data['time'] == 'night' and self.state == 0:",
+             "    count = 0",
+             "    for zombie in zombies:",
+             "        if zombie.lane == self.lane:",
+             "            count+=1",
+             "    if count > 0:",
+             "        projectiles.append(Bullet(self.x, self.y, 'projectiles:spore'))",
+             "count = 0",
+             "for zombie in zombies:",
+             "    if zombie.lane == self.lane and zombie.x - self.x < 4*SCALE:",
+             "      count += 1",
+             "if count > 0 and self.state == 0:",
+             "    self.state = 1",
+             "    self.sprite = pg.image.load('data/plants/scaredyshroom/sprite1.png').convert_alpha()",
+             "else:",
+             "    if self.state == 1 and count == 0:",
+             "        self.state = 0",
+             "        self.sprite = pg.image.load('data/plants/scaredyshroom/sprite0.png').convert_alpha()"
+  ],
+  "burst": 1
+}

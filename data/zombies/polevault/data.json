@@ -1,17 +1,17 @@
 {
   "id": "polevault",
   "speed": 1.5,
-  "health": 125,
+  "health": 350,
   "sprite": "data/zombies/polevault/sprite0.png",
-  "damage": 20,
+  "damage": 15,
   "tick": [
     "self.default_tick(frame_number)",
-    "if self.eat and self.state == 0:",
+    "if self.eat is not None and self.state == 0:",
     "    self.state = 1",
     "    self.speed = get_data('zombies:basic')['speed']",
     "    self.sprite = pg.image.load('data/zombies/polevault/sprite1.png').convert_alpha()",
     "    self.cooldown = time.time()",
-    "if self.state == 1 and int(time.time() - int(self.cooldown)) > 0.25 and int(time.time()) != self.cooldown:",
+    "if self.state == 1 and int(time.time() - int(self.cooldown)) > 0.25 and int(time.time()) != self.cooldown and self.eat is not None:",
     "    self.x = (self.eat.x - 1.25*SCALE)",
     "    self.eat = None",
     "    self.state = 2"

@@ -1,5 +1,5 @@
 {
-  "sprite": "data/projectiles/pea/sprite0.png",
+  "sprite": "data/projectiles/spore/sprite0.png",
   "projectile_speed": 8,
   "damage": 20,
   "fire_sound": "sounds:fire",
