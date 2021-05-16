@@ -1,6 +1,6 @@
 import global_vars
 
-global_vars.set_var('level', 'levels:' + input('level: '))
+global_vars.set_var('level', 'locations/' + input('level: '))
 global_vars.set_var(
     'plants', [
         'plants:sunflower',

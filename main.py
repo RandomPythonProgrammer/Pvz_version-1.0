@@ -21,24 +21,19 @@ pg.display.set_caption('PVZ clone')
 pg.display.set_icon(pg.image.load('data/plants/repeater/sprite0.png').convert_alpha())
 clock = pg.time.Clock()
 
-# roam_music = pg.mixer.Sound('data/other/')
-# wave_music = pg.mixer.Sound('data/other/')
-
 
 def get_data(full_id):
-    item_type, item_id = full_id.split(':')
-    with open('data/' + item_type + "/" + item_id + '/data.json', 'r') as data_file:
+
+    with open('data/' + "/".join(full_id.split(':')) + '/data.json', 'r') as data_file:
         return json.load(data_file)
 
 
 def get_image(full_id):
-    item_type, item_id = full_id.split(':')
-    return str('data/' + item_type + "/" + item_id + '.png')
+    return str('data/' + "/".join(full_id.split(':')) + '.png')
 
 
 def get_sound(full_id):
-    item_type, item_id = full_id.split(':')
-    return str('data/' + item_type + "/" + item_id + '.mp3')
+    return str('data/' + "/".join(full_id.split(':')) + '.mp3')
 
 
 class Drawable:
@@ -251,7 +246,7 @@ class Tile:
         self.occupied = False
         self.species = random.randint(1, 4)
         self.version = version
-        self.sprite = pg.image.load('data/other/grass/grass' + str(self.version) + '-' + str(self.species) + '.png')
+        self.sprite = pg.image.load(get_data('/'.join(current_level.split(':')[:-1]))['tiles'] + '/' + "tile" + str(self.version) + '-' + str(self.species) + '.png')
 
     def draw(self, surface):
         surface.blit(self.sprite, (int(self.x), int(self.y)))
@@ -322,9 +317,10 @@ waves = get_data(current_level)['waves']
 wave_time = None
 level_data = get_data(current_level)
 game_start = False
-cooldown = 30
 drawables = []
-chance = 1500
+cooldown = get_data('/'.join(current_level.split(':')[:-1]))['cooldown']
+chance = get_data('/'.join(current_level.split(':')[:-1]))['chance']
+sun_rate = get_data('/'.join(current_level.split(':')[:-1]))['sun_rate']
 
 
 def tick(frame_number):
@@ -336,7 +332,7 @@ def tick(frame_number):
     global cooldown
     global game_start
     global run
-    if random.randint(0, 400) == 1:
+    if random.randint(0, sun_rate) == 1:
         suns.append(Sun(random.randint(0, 10 * SCALE), random.randint(SCALE, 8 * SCALE)))
     for sun in suns:
         sun.tick(frame_number)
@@ -416,7 +412,7 @@ def tick(frame_number):
 
 
 def draw_screen(surface, frame_number):
-    surface.fill((150, 150, 255))
+    surface.fill(get_data('/'.join(current_level.split(':')[:-1]))['background'])
 
     for tile in tiles:
         tile.draw(surface)
