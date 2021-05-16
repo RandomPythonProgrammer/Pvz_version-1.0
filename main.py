@@ -5,6 +5,7 @@ import pygame as pg
 import json
 import random
 import global_vars
+import math
 
 SCALE = 64
 FPS = 60
@@ -47,11 +48,13 @@ class Drawable:
 
 
 class Bullet:
-    def __init__(self, x, y, projectile_id, damage=None):
+    def __init__(self, x, y, projectile_id, damage=None, angle=0):
         self.x = x
         self.y = y
         self.data = get_data(projectile_id)
         self.speed = self.data['projectile_speed']
+        self.change_y = math.sin((angle*180/math.pi))*self.speed
+        self.change_x = math.cos((angle*180/math.pi))*self.speed
         if damage is not None:
             self.damage = damage
         else:
@@ -68,7 +71,8 @@ class Bullet:
         if self.x > SCREEN_WIDTH:
             projectiles.remove(self)
         if frame_number % 2 == 0:
-            self.x += self.speed
+            self.x += self.change_x
+            self.y += self.change_y
             for zombie in zombies:
                 if zombie.lane == self.lane:
                     if pg.Rect(zombie.x, zombie.y, SCALE, SCALE).colliderect(pg.Rect(self.x, self.y, SCALE, SCALE)):
@@ -89,13 +93,16 @@ class Bullet:
 
 
 class Fume:
-    def __init__(self, x, y, projectile_id):
+    def __init__(self, x, y, projectile_id, angle=0):
         self.x = x
         self.y = y
         self.data = get_data(projectile_id)
         self.damage = self.data['damage']
         self.lane = self.y / SCALE
         self.sprite = pg.image.load(self.data['sprite']).convert_alpha()
+
+        self.change_y = math.sin((angle*180/math.pi))*self.speed
+        self.change_x = math.cos((angle*180/math.pi))*self.speed
         try:
             self.hit_sound = Sound(self.data['hit_sound'])
             Sound(self.data['fire_sound']).play()
