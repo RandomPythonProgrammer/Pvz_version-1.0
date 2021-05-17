@@ -39,6 +39,7 @@ def get_sound(full_id):
 
 class Drawable:
     def __init__(self, image_source, location, drawable_id):
+        self.x, self.y = location
         self.location = location
         self.image = pg.image.load(image_source).convert_alpha()
         self.id = drawable_id
@@ -153,7 +154,7 @@ class Zombie:
 
     def tick(self, frame_number):
         try:
-            if len(self.data['tick']) > 0:
+            if len(self.data['tick']) > 1:
                 exec("\n".join(self.data['tick']))
             else:
                 exec(self.data['tick'])
@@ -218,10 +219,11 @@ class Plant:
         self.cost = self.data['cost']
         self.state = 0
         self.queue = []
+        self.return_value = None
 
     def tick(self, frame_number):
         try:
-            if len(self.data['tick']) > 0:
+            if len(self.data['tick']) > 1:
                 exec("\n".join(self.data['tick']))
             else:
                 exec(self.data['tick'])
@@ -242,13 +244,25 @@ class Plant:
             pass
 
     def requirements(self):
+        self.return_value = None
         try:
-            if len(self.data['requirements']) > 0:
+            if len(self.data['requirements']) > 1:
                 exec("\n".join(self.data['requirements']))
             else:
                 exec(self.data['requirements'])
         except KeyError:
-            return True
+            return self.default_requirements()
+        if self.return_value is not None:
+            return self.return_value
+        else:
+            return False
+
+    def default_requirements(self):
+        for background_object in background_objects:
+            if pg.Rect(background_object.x, background_object.y, SCALE, SCALE).colliderect(self.x, self.y, SCALE, SCALE)\
+                    and background_object.id != 'grave' and self.tile.id not in ["roof", "water"]:
+                return False
+        return True
 
     def attack(self):
         if type(self.data['attack']) == list:
@@ -303,6 +317,8 @@ class Tile:
         self.occupied = False
         self.species = random.randint(1, 4)
         self.version = version
+        # this is a placeholder that will change later to reflect the level such as pool or roof
+        self.id = 'grass'
         self.sprite = pg.image.load(location_data['tiles'] + '/' + "tile" + str(self.version) + '-' + str(self.species) + '.png')
 
     def draw(self, surface):
@@ -392,7 +408,7 @@ def tick(frame_number):
     global game_start
     global run
     try:
-        if len(location_data['tick']) > 0:
+        if len(location_data['tick']) > 1:
             exec("\n".join(location_data['tick']))
         else:
             exec(location_data['tick'])
@@ -466,7 +482,7 @@ def tick(frame_number):
             for i in range(wave[key]):
                 zombie_queue.append(key)
         try:
-            if len(location_data['wave']) > 0:
+            if len(location_data['wave']) > 1:
                 exec("\n".join(location_data['wave']))
             else:
                 exec(location_data['wave'])
@@ -489,10 +505,10 @@ def draw_screen(surface, frame_number):
 
     for tile in tiles:
         tile.draw(surface)
-    for plant in plants:
-        plant.draw(surface)
     for background_object in background_objects:
         background_object.draw(surface)
+    for plant in plants:
+        plant.draw(surface)
     for i in range(1, LANES+2):
         for zombie in zombies:
             if zombie.lane == i:
@@ -525,7 +541,7 @@ for x in range(0, 11):
 frame = 1
 
 try:
-    if len(location_data['start']) > 0:
+    if len(location_data['start']) > 1:
         exec("\n".join(location_data['start']))
     else:
         exec(location_data['start'])
@@ -541,7 +557,7 @@ while run:
 
         if event.type == pg.KEYDOWN and DEBUG:
             if event.key == pg.K_z:
-                zombies.append(Zombie('zombies:basic', 10*SCALE, random.randint(1, 8)*SCALE, frame))
+                pass
             if event.key == pg.K_s:
                 sun_count += 500
             if event.key == pg.K_c:

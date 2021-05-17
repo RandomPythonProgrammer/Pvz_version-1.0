@@ -1,0 +1,27 @@
+{
+  "id": "gravebuster",
+  "health": 100,
+  "sprite": "data/plants/puffshroom/sprite0.png",
+  "display_sprite": "data/plants/puffshroom/sprite0.png",
+  "cost": 75,
+  "cooldown": 12,
+  "attack_speed": 1.5,
+  "starting_cooldown": 12,
+  "tick": [
+    "if time.time()-self.time_starting > 4:",
+    "    for object in background_objects:",
+    "        if object.id == 'grave' and pg.Rect(object.x, object.y, SCALE, SCALE).colliderect(self.x, self.y, SCALE, SCALE):",
+    "            background_objects.remove(object)",
+    "            for tile in tiles:",
+    "                if pg.Rect(tile.x, tile.y, SCALE, SCALE).colliderect(self.x, self.y, SCALE, SCALE):",
+    "                       tile.occupied = False",
+    "            plants.remove(self)"
+
+  ],
+  "burst": 1,
+  "requirements": [
+    "for background_object in background_objects:",
+    "     if pg.Rect(background_object.x, background_object.y, SCALE, SCALE).colliderect(self.x, self.y, SCALE, SCALE) and background_object.id == 'grave':",
+    "         self.return_value = True"
+  ]
+}

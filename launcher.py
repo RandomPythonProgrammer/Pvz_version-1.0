@@ -5,7 +5,7 @@ global_vars.set_var(
     'plants', [
         'plants:sunflower',
         'plants:peashooter',
-        'plants:repeater',
+        'plants:gravebuster',
         'plants:sunshroom',
         'plants:scaredyshroom',
         'plants:puffshroom'

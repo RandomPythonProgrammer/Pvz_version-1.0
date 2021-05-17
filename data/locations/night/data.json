@@ -16,22 +16,22 @@
     "        background_objects.append(Drawable(",
     "                                           get_image('locations:night:images:grave'),",
     "                                           location,",
-    "                                           'grave',",
+    "                                           drawable_id = 'grave',",
     "                                           ))"
     ],
   "start": [
     "for i in range(level_data['graves']['start']):",
     "    background_objects.append(Drawable(",
     "                                       get_image('locations:night:images:grave'),",
-    "                                       (random.randrange(2 * SCALE, 10 * SCALE, SCALE), random.randrange(SCALE, 8 * SCALE, SCALE)),",
-    "                                       'grave',",
+    "                                       (random.randrange(2 * SCALE, 10 * SCALE, SCALE), random.randrange(SCALE, 9 * SCALE, SCALE)),",
+    "                                       drawable_id = 'grave',",
     "                                       ))"
   ],
   "wave": [
-    "for drawable in drawables:",
-    "    if drawable.id == grave:",
+    "for drawable in background_objects:",
+    "    if drawable.id == 'grave':",
     "        zombie_choice = random.choice(zombie_queue)",
-    "        zombies.append(Zombie(zombie_choice, 10*SCALE, random.randint(1, 8)*SCALE, frame))",
-    "        zombie_queue.remove(zombie_choice)"
+    "        print('GRAVE')",
+    "        zombies.append(Zombie(zombie_choice, drawable.x, drawable.y, frame))"
   ]
 }
