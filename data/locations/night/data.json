@@ -1,6 +1,6 @@
 {
   "cooldown": 20,
-  "chance": 800,
+  "chance": 950,
   "sun_rate": 0,
   "tiles": "data/locations/night/images",
   "background": [50, 75, 100],
@@ -23,7 +23,7 @@
     "for i in range(level_data['graves']['start']):",
     "    background_objects.append(Drawable(",
     "                                       get_image('locations:night:images:grave'),",
-    "                                       (random.randrange(2 * SCALE, 10 * SCALE, SCALE), random.randrange(SCALE, 9 * SCALE, SCALE)),",
+    "                                       (random.randrange(3 * SCALE, 10 * SCALE, SCALE), random.randrange(SCALE, 9 * SCALE, SCALE)),",
     "                                       drawable_id = 'grave',",
     "                                       ))"
   ],

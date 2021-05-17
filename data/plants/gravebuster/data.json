@@ -1,8 +1,8 @@
 {
   "id": "gravebuster",
   "health": 100,
-  "sprite": "data/plants/puffshroom/sprite0.png",
-  "display_sprite": "data/plants/puffshroom/sprite0.png",
+  "sprite": "data/plants/gravebuster/sprite0.png",
+  "display_sprite": "data/plants/gravebuster/sprite0.png",
   "cost": 75,
   "cooldown": 12,
   "attack_speed": 1.5,
@@ -15,7 +15,10 @@
     "            for tile in tiles:",
     "                if pg.Rect(tile.x, tile.y, SCALE, SCALE).colliderect(self.x, self.y, SCALE, SCALE):",
     "                       tile.occupied = False",
-    "            plants.remove(self)"
+    "            try:",
+    "                plants.remove(self)",
+    "            except ValueError:",
+    "                pass"
 
   ],
   "burst": 1,

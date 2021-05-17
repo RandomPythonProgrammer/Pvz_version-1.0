@@ -13,7 +13,7 @@ SCREEN_HEIGHT = 11 * SCALE
 SCREEN_WIDTH = 11 * SCALE
 VOLUME = 1.2
 LANES = 7
-DEBUG = True
+DEBUG = global_vars.get_var('DEBUG')
 
 pg.font.init()
 pg.mixer.init()
@@ -94,7 +94,7 @@ class Bullet:
 
 
 class Fume:
-    def __init__(self, x, y, projectile_id, damage=None, length=5, angle=0):
+    def __init__(self, x, y, projectile_id, damage=None, length=4, angle=0):
         self.x = x
         self.y = y
         self.data = get_data(projectile_id)
@@ -126,7 +126,8 @@ class Fume:
             projectiles.remove(self)
 
     def draw(self, surface):
-        surface.blit(self.sprite, (self.x, self.y))
+        for i in range(self.length):
+            surface.blit(self.sprite, (self.x + i * SCALE, self.y))
 
 
 class Zombie:
@@ -557,7 +558,7 @@ while run:
 
         if event.type == pg.KEYDOWN and DEBUG:
             if event.key == pg.K_z:
-                pass
+                zombies.append(Zombie('zombies:basic', 10*SCALE, random.randint(1, 8)*SCALE, frame))
             if event.key == pg.K_s:
                 sun_count += 500
             if event.key == pg.K_c:

@@ -4,9 +4,9 @@
   "sprite": "data/plants/puffshroom/sprite0.png",
   "display_sprite": "data/plants/puffshroom/sprite0.png",
   "cost": 0,
-  "cooldown": 5,
+  "cooldown": 3,
   "attack_speed": 1.5,
-  "starting_cooldown": 5,
+  "starting_cooldown": 3,
   "attack": [
              "if location_data['time'] == 'night':",
              "    count = 0",

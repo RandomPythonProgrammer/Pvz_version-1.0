@@ -1,18 +1,18 @@
 {
   "waves": [
     {
-      "zombies:conehead": 10,
+      "zombies:conehead": 6,
+      "zombies:basic": 12
+    },
+    {
+      "zombies:buckethead": 2,
+      "zombies:conehead": 8,
+      "zombies:basic": 14
+    },
+    {
+      "zombies:buckethead": 4,
+      "zombies:conehead": 12,
       "zombies:basic": 20
-    },
-    {
-      "zombies:buckethead": 5,
-      "zombies:conehead": 15,
-      "zombies:basic": 25
-    },
-    {
-      "zombies:buckethead": 10,
-      "zombies:conehead": 20,
-      "zombies:basic": 40
     }
 
   ],
@@ -22,6 +22,6 @@
   },
   "graves": {
     "start": 2,
-    "chance": 1500
+    "chance": 2100
   }
 }

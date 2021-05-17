@@ -1,8 +1,8 @@
 {
   "id": "newspaper",
-  "speed": 1,
+  "speed": 0.4,
   "health": 210,
-  "sprite": "data/zombies/polevault/sprite0.png",
+  "sprite": "data/zombies/newspaper/sprite0.png",
   "damage": 15,
   "tick": [
     "self.default_tick(frame_number)",
