@@ -93,16 +93,18 @@ class Bullet:
 
 
 class Fume:
-    def __init__(self, x, y, projectile_id, angle=0):
+    def __init__(self, x, y, projectile_id, damage=None, length=5, angle=0):
         self.x = x
         self.y = y
         self.data = get_data(projectile_id)
-        self.damage = self.data['damage']
+        if damage is None:
+            self.damage = self.data['damage']
+        else:
+            self.damage = damage
         self.lane = self.y / SCALE
+        self.length = length
         self.sprite = pg.image.load(self.data['sprite']).convert_alpha()
 
-        self.change_y = math.sin((angle*180/math.pi))*self.speed
-        self.change_x = math.cos((angle*180/math.pi))*self.speed
         try:
             self.hit_sound = Sound(self.data['hit_sound'])
             Sound(self.data['fire_sound']).play()
@@ -111,7 +113,7 @@ class Fume:
         self.start_time = time.time()
         for zombie in zombies:
             if zombie.lane == self.lane:
-                if pg.Rect(zombie.x, zombie.y, SCALE, SCALE).colliderect(pg.Rect(self.x, self.y, SCALE, SCALE)):
+                if pg.Rect(zombie.x, zombie.y, SCALE, SCALE).colliderect(pg.Rect(self.x, self.y, self.length*SCALE, SCALE)):
                     zombie.health -= self.damage
                     try:
                         self.hit_sound.play()
@@ -503,7 +505,7 @@ while run:
 
         if event.type == pg.KEYDOWN and DEBUG:
             if event.key == pg.K_z:
-                zombies.append(Zombie('zombies:polevault', 10*SCALE, random.randint(1, 8)*SCALE, frame))
+                zombies.append(Zombie('zombies:basic', 10*SCALE, random.randint(1, 8)*SCALE, frame))
             if event.key == pg.K_s:
                 sun_count += 500
             if event.key == pg.K_c:

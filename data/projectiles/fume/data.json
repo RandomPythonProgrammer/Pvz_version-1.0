@@ -1,0 +1,6 @@
+{
+  "sprite": "data/projectiles/fume/sprite0.png",
+  "damage": 20,
+  "fire_sound": "sounds:fire",
+  "hit_sound": "sounds:hit"
+}

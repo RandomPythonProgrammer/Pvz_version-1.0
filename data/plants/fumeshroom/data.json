@@ -14,7 +14,7 @@
              "        if zombie.lane == self.lane and zombie.x - self.x < 5*SCALE:",
              "            count+=1",
              "    if count > 0:",
-             "        projectiles.append(Fume(self.x, self.y, 'projectiles:fume'))"
+             "        projectiles.append(Fume(self.x+SCALE, self.y, 'projectiles:fume'))"
             ],
   "burst": 1
 }
