@@ -1,0 +1,15 @@
+{
+  "id": "newspaper",
+  "speed": 1,
+  "health": 210,
+  "sprite": "data/zombies/polevault/sprite0.png",
+  "damage": 15,
+  "tick": [
+    "self.default_tick(frame_number)",
+    "if self.health <= 110 and self.state == 0:",
+    "    self.state = 1",
+    "    self.speed = 1.5",
+    "    self.sprite = pg.image.load('data/zombies/newspaper/sprite1.png').convert_alpha()"
+  ]
+}
+

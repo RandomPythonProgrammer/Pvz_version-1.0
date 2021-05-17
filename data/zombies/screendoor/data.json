@@ -1,0 +1,15 @@
+{
+  "id": "screendoor",
+  "speed": 1,
+  "health": 210,
+  "shield": 650,
+  "sprite": "data/zombies/screendoor/sprite0.png",
+  "damage": 15,
+  "tick": [
+    "self.default_tick(frame_number)",
+    "if self.shield <= 0 and self.state == 0:",
+    "    self.state = 1",
+    "    self.sprite = pg.image.load('data/zombies/basic/sprite0.png').convert_alpha()"
+  ]
+}
+
