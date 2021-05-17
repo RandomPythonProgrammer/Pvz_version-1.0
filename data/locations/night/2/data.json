@@ -20,5 +20,9 @@
     "zombies:basic": 12,
     "zombies:conehead": 5,
     "zombies:buckethead": 2
+  },
+  "graves": {
+    "start": 4,
+    "chance": 1200
   }
 }

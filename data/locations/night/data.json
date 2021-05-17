@@ -4,5 +4,34 @@
   "sun_rate": 0,
   "tiles": "data/locations/night/images",
   "background": [50, 75, 100],
-  "time": "night"
+  "time": "night",
+  "tick": [
+    "if random.randint(0, level_data['graves']['chance']) == 1:",
+    "    count = 0",
+    "    location = (random.randrange(2 * SCALE, 10 * SCALE, SCALE), random.randrange(SCALE, 8 * SCALE, SCALE))",
+    "    for tile in tiles:",
+    "        if pg.Rect(tile.x, tile.y, SCALE, SCALE).collidepoint(location[0], location[1]) and tile.occupied:",
+    "            count += 1",
+    "    if count == 0:",
+    "        background_objects.append(Drawable(",
+    "                                           get_image('locations:night:images:grave'),",
+    "                                           location,",
+    "                                           'grave',",
+    "                                           ))"
+    ],
+  "start": [
+    "for i in range(level_data['graves']['start']):",
+    "    background_objects.append(Drawable(",
+    "                                       get_image('locations:night:images:grave'),",
+    "                                       (random.randrange(2 * SCALE, 10 * SCALE, SCALE), random.randrange(SCALE, 8 * SCALE, SCALE)),",
+    "                                       'grave',",
+    "                                       ))"
+  ],
+  "wave": [
+    "for drawable in drawables:",
+    "    if drawable.id == grave:",
+    "        zombie_choice = random.choice(zombie_queue)",
+    "        zombies.append(Zombie(zombie_choice, 10*SCALE, random.randint(1, 8)*SCALE, frame))",
+    "        zombie_queue.remove(zombie_choice)"
+  ]
 }

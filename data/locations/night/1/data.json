@@ -19,5 +19,9 @@
   "roam_zombies": {
     "zombies:basic": 15,
     "zombies:conehead": 7
+  },
+  "graves": {
+    "start": 2,
+    "chance": 1500
   }
 }

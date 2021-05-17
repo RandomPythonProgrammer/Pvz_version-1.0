@@ -241,6 +241,15 @@ class Plant:
         except KeyError:
             pass
 
+    def requirements(self):
+        try:
+            if len(self.data['requirements']) > 0:
+                exec("\n".join(self.data['requirements']))
+            else:
+                exec(self.data['requirements'])
+        except KeyError:
+            return True
+
     def attack(self):
         if type(self.data['attack']) == list:
             exec(str("\n".join(self.data['attack'])))
@@ -370,6 +379,7 @@ location_data = get_data('/'.join(current_level.split(':')[:-1]))
 cooldown = location_data['cooldown']
 chance = location_data['chance']
 sun_rate = location_data['sun_rate']
+background_objects = []
 
 
 def tick(frame_number):
@@ -381,6 +391,13 @@ def tick(frame_number):
     global cooldown
     global game_start
     global run
+    try:
+        if len(location_data['tick']) > 0:
+            exec("\n".join(location_data['tick']))
+        else:
+            exec(location_data['tick'])
+    except KeyError:
+        pass
     if random.randint(0, sun_rate) == 1:
         suns.append(Sun(random.randint(0, 10 * SCALE), random.randint(SCALE, 8 * SCALE)))
     for sun in suns:
@@ -448,6 +465,13 @@ def tick(frame_number):
         for key in list(wave.keys()):
             for i in range(wave[key]):
                 zombie_queue.append(key)
+        try:
+            if len(location_data['wave']) > 0:
+                exec("\n".join(location_data['wave']))
+            else:
+                exec(location_data['wave'])
+        except KeyError:
+            pass
         while len(zombie_queue) > 0:
             zombie_choice = random.choice(zombie_queue)
             zombies.append(Zombie(zombie_choice, 10 * SCALE, random.randint(1, 8) * SCALE, frame, wave=True))
@@ -467,14 +491,16 @@ def draw_screen(surface, frame_number):
         tile.draw(surface)
     for plant in plants:
         plant.draw(surface)
-    for sun in suns:
-        sun.draw(surface)
+    for background_object in background_objects:
+        background_object.draw(surface)
     for i in range(1, LANES+2):
         for zombie in zombies:
             if zombie.lane == i:
                 zombie.draw(surface)
     for projectile in projectiles:
         projectile.draw(surface)
+    for sun in suns:
+        sun.draw(surface)
     for drawable in drawables:
         drawable.draw(surface)
 
@@ -497,6 +523,16 @@ for x in range(0, 11):
                 tiles.append(Tile(x * SCALE, y * SCALE, 1))
 
 frame = 1
+
+try:
+    if len(location_data['start']) > 0:
+        exec("\n".join(location_data['start']))
+    else:
+        exec(location_data['start'])
+except KeyError:
+    pass
+
+
 while run:
     clock.tick(FPS)
     for event in pg.event.get():
@@ -521,15 +557,16 @@ while run:
                 if item['id'] == selected_plant and item['cooldown'] <= 0 and sun_count >= get_data(selected_plant)['cost']:
                     for tile in tiles:
                         if not tile.occupied and pg.Rect(tile.x, tile.y, SCALE, SCALE).collidepoint(pg.mouse.get_pos()):
-                            tile.occupied = True
-                            plants.append(Plant(selected_plant, tile, frame_num=frame))
-                            sun_count -= get_data(selected_plant)['cost']
-                            for item in bottom_bar.items:
-                                if item['id'] == selected_plant:
-                                    item['cooldown'] = get_data(item['id'])['cooldown']
-                                    selected_plant = None
-                                    bottom_bar.selected = None
-                            Sound('sounds:plant').play()
+                            if Plant(selected_plant, tile, frame_num=frame).requirements():
+                                tile.occupied = True
+                                plants.append(Plant(selected_plant, tile, frame_num=frame))
+                                sun_count -= get_data(selected_plant)['cost']
+                                for item in bottom_bar.items:
+                                    if item['id'] == selected_plant:
+                                        item['cooldown'] = get_data(item['id'])['cooldown']
+                                        selected_plant = None
+                                        bottom_bar.selected = None
+                                Sound('sounds:plant').play()
 
         for sun in suns:
             if pg.Rect(sun.x, sun.y, SCALE / 2, SCALE / 2).collidepoint(pg.mouse.get_pos()):

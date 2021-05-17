@@ -23,5 +23,9 @@
     "zombies:conehead": 6,
     "zombies:buckethead": 3,
     "zombies:polevault": 4
+  },
+  "graves": {
+    "start": 6,
+    "chance": 900
   }
 }
