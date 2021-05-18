@@ -31,7 +31,6 @@
     "for drawable in background_objects:",
     "    if drawable.id == 'grave':",
     "        zombie_choice = random.choice(zombie_queue)",
-    "        print('GRAVE')",
     "        zombies.append(Zombie(zombie_choice, drawable.x, drawable.y, frame))"
   ]
 }
