@@ -435,7 +435,8 @@ def tick(frame_number):
 
     if time.time() - cooldown_start_time > cooldown and not wave_mode and len(waves) > 0:
         if len(zombie_queue) == 0 and wave_zombie_count == 0:
-            print("Start Roam")
+            if DEBUG:
+                print("Start Roam")
             pg.mixer.fadeout(4)
             Sound('sounds:main_theme').play()
             roam_zombies = level_data['roam_zombies']
@@ -445,8 +446,8 @@ def tick(frame_number):
 
         if len(zombie_queue) > 0:
             rate = int(chance - 5*(time.time() - cooldown_start_time))
-            if rate < 100:
-                rate = 100
+            if rate < 120:
+                rate = 120
             if random.randint(0, rate) == 1:
                 zombie_choice = random.choice(zombie_queue)
                 zombies.append(Zombie(zombie_choice, 10*SCALE, random.randint(1, 8)*SCALE, frame))
@@ -472,12 +473,13 @@ def tick(frame_number):
         run = False
         global_vars.set_var("complete", True)
 
-    if wave_mode and time.time() - wave_time > 5:
+    if wave_mode and time.time() - wave_time > 5 and len(zombie_queue) == 0:
         Sound('sounds:wave_theme').play()
         for drawable in drawables:
             if drawable.id == 'wave':
                 drawables.remove(drawable)
-        print("Start Wave")
+        if DEBUG:
+            print("Start Wave")
         wave = waves[0]
         for key in list(wave.keys()):
             for i in range(wave[key]):
@@ -489,16 +491,18 @@ def tick(frame_number):
                 exec(location_data['wave'])
         except KeyError:
             pass
-        while len(zombie_queue) > 0:
+    if wave_mode and len(zombie_queue) > 0:
+        if frame_number % 30 == 0:
             zombie_choice = random.choice(zombie_queue)
             zombies.append(Zombie(zombie_choice, 10 * SCALE, random.randint(1, 8) * SCALE, frame, wave=True))
             zombie_queue.remove(zombie_choice)
-        waves.remove(wave)
-        wave_mode = False
-        cooldown = 5
-        cooldown_start_time = time.time()
-        wave_time = None
-        chance = 800
+            waves.remove(wave)
+        if len(zombie_queue) == 0:
+            wave_mode = False
+            cooldown = 5
+            cooldown_start_time = time.time()
+            wave_time = None
+            chance = 800
 
 
 def draw_screen(surface, frame_number):

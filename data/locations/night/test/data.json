@@ -1,0 +1,30 @@
+{
+  "waves": [
+    {
+      "zombies:conehead": 3,
+      "zombies:basic": 12
+    },
+    {
+      "zombies:buckethead": 1,
+      "zombies:conehead": 5,
+      "zombies:basic": 15,
+      "zombies:newspaper": 5,
+      "zombies:screendoor": 2
+    },
+    {
+      "zombies:buckethead": 7,
+      "zombies:conehead": 9,
+      "zombies:basic": 19,
+      "zombies:newspaper": 7,
+      "zombies:screendoor": 3
+    }
+
+  ],
+  "roam_zombies": {
+    "zombies:basic": 2
+  },
+  "graves": {
+    "start": 6,
+    "chance": 1600
+  }
+}

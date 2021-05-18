@@ -1,12 +1,17 @@
 import global_vars
 
-DEBUG = False
+DEBUG = True
 
 global_vars.set_var('level', 'locations/' + input('level: '))
 plants = []
 print("Choose Plants:")
-while len(plants) < 6:
-    plants.append("plants:" + input())
+stop = False
+while len(plants) < 6 and not stop:
+    choice = input()
+    if choice != '':
+        plants.append("plants:" + choice)
+    else:
+        stop = True
 
 global_vars.set_var(
     'plants', plants
