@@ -3,15 +3,13 @@ import global_vars
 DEBUG = False
 
 global_vars.set_var('level', 'locations/' + input('level: '))
+plants = []
+print("Choose Plants:")
+while len(plants) < 6:
+    plants.append("plants:" + input())
+
 global_vars.set_var(
-    'plants', [
-        'plants:walnut',
-        'plants:fumeshroom',
-        'plants:gravebuster',
-        'plants:sunshroom',
-        'plants:scaredyshroom',
-        'plants:puffshroom'
-    ]
+    'plants', plants
 )
 global_vars.set_var('DEBUG', DEBUG)
 
