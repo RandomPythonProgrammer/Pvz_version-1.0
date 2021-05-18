@@ -155,7 +155,7 @@ class Zombie:
 
     def tick(self, frame_number):
         try:
-            if len(self.data['tick']) > 1:
+            if type(self.data['tick']) == list:
                 exec("\n".join(self.data['tick']))
             else:
                 exec(self.data['tick'])
@@ -224,7 +224,7 @@ class Plant:
 
     def tick(self, frame_number):
         try:
-            if len(self.data['tick']) > 1:
+            if type(self.data['tick']) == list:
                 exec("\n".join(self.data['tick']))
             else:
                 exec(self.data['tick'])
@@ -247,7 +247,7 @@ class Plant:
     def requirements(self):
         self.return_value = None
         try:
-            if len(self.data['requirements']) > 1:
+            if type(self.data['requirements']) == list:
                 exec("\n".join(self.data['requirements']))
             else:
                 exec(self.data['requirements'])
@@ -409,7 +409,7 @@ def tick(frame_number):
     global game_start
     global run
     try:
-        if len(location_data['tick']) > 1:
+        if type(location_data['tick']) == list:
             exec("\n".join(location_data['tick']))
         else:
             exec(location_data['tick'])
@@ -483,7 +483,7 @@ def tick(frame_number):
             for i in range(wave[key]):
                 zombie_queue.append(key)
         try:
-            if len(location_data['wave']) > 1:
+            if type(location_data['wave']) == list:
                 exec("\n".join(location_data['wave']))
             else:
                 exec(location_data['wave'])
@@ -542,7 +542,7 @@ for x in range(0, 11):
 frame = 1
 
 try:
-    if len(location_data['start']) > 1:
+    if type(location_data['start']) == list:
         exec("\n".join(location_data['start']))
     else:
         exec(location_data['start'])
