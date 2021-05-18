@@ -1,6 +1,6 @@
 {
   "cooldown": 20,
-  "chance": 950,
+  "chance": 850,
   "sun_rate": 0,
   "tiles": "data/locations/night/images",
   "background": [50, 75, 100],

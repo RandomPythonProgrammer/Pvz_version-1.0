@@ -397,6 +397,7 @@ cooldown = location_data['cooldown']
 chance = location_data['chance']
 sun_rate = location_data['sun_rate']
 background_objects = []
+wave = None
 
 
 def tick(frame_number):
@@ -408,6 +409,7 @@ def tick(frame_number):
     global cooldown
     global game_start
     global run
+    global wave
     try:
         if type(location_data['tick']) == list:
             exec("\n".join(location_data['tick']))
@@ -496,7 +498,10 @@ def tick(frame_number):
             zombie_choice = random.choice(zombie_queue)
             zombies.append(Zombie(zombie_choice, 10 * SCALE, random.randint(1, 8) * SCALE, frame, wave=True))
             zombie_queue.remove(zombie_choice)
-            waves.remove(wave)
+            try:
+                waves.remove(wave)
+            except ValueError:
+                pass
         if len(zombie_queue) == 0:
             wave_mode = False
             cooldown = 5
