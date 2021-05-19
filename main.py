@@ -610,7 +610,11 @@ while run:
             for item in bottom_bar.items:
                 if item['id'] == selected_plant and item['cooldown'] <= 0 and sun_count >= get_data(selected_plant)['cost']:
                     for tile in tiles:
-                        if (not tile.occupied or tile.occupied_plant.plantable) and pg.Rect(tile.x, tile.y, SCALE, SCALE).collidepoint(pg.mouse.get_pos()):
+                        try:
+                            plantable = get_data(tile.occupied_plant)['plantable']
+                        except (KeyError, AttributeError):
+                            plantable = False
+                        if (not tile.occupied or plantable) and pg.Rect(tile.x, tile.y, SCALE, SCALE).collidepoint(pg.mouse.get_pos()):
                             if Plant(selected_plant, tile, frame_num=frame).requirements():
                                 tile.occupied = True
                                 tile.occupied_plant = selected_plant
