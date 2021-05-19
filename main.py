@@ -540,18 +540,24 @@ def draw_screen(surface, frame_number):
     pg.display.update()
 
 
-for x in range(0, 11):
-    for y in range(1, 9):
-        if x % 2 == 0:
-            if y % 2 == 0:
-                tiles.append(Tile(x * SCALE, y * SCALE, 1))
+try:
+    if len(location_data['create_tiles']) > 1:
+        exec("\n".join(location_data['create_tiles']))
+    else:
+        exec(location_data['create_tiles'])
+except KeyError:
+    for x in range(0, 11):
+        for y in range(1, 9):
+            if x % 2 == 0:
+                if y % 2 == 0:
+                    tiles.append(Tile(x * SCALE, y * SCALE, 1))
+                else:
+                    tiles.append(Tile(x * SCALE, y * SCALE, 2))
             else:
-                tiles.append(Tile(x * SCALE, y * SCALE, 2))
-        else:
-            if y % 2 == 0:
-                tiles.append(Tile(x * SCALE, y * SCALE, 2))
-            else:
-                tiles.append(Tile(x * SCALE, y * SCALE, 1))
+                if y % 2 == 0:
+                    tiles.append(Tile(x * SCALE, y * SCALE, 2))
+                else:
+                    tiles.append(Tile(x * SCALE, y * SCALE, 1))
 
 frame = 1
 
