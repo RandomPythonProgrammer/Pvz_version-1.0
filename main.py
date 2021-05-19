@@ -320,7 +320,8 @@ class Tile:
         self.version = version
         # this is a placeholder that will change later to reflect the level such as pool or roof
         self.id = 'grass'
-        self.sprite = pg.image.load(location_data['tiles'] + '/' + "tile" + str(self.version) + '-' + str(self.species) + '.png')
+        path = location_data['tiles'] + '/' + "tile" + str(self.version) + '-' + str(self.species) + '.png'
+        self.sprite = pg.image.load(path)
 
     def draw(self, surface):
         surface.blit(self.sprite, (int(self.x), int(self.y)))
@@ -513,8 +514,12 @@ def tick(frame_number):
 def draw_screen(surface, frame_number):
     surface.fill(location_data['background'])
 
-    for tile in tiles:
-        tile.draw(surface)
+    try:
+        background_image = location_data['image']
+        surface.blit(pg.image.load(background_image).convert(), 0, 0)
+    except KeyError:
+        for tile in tiles:
+            tile.draw(surface)
     for background_object in background_objects:
         background_object.draw(surface)
     for plant in plants:
