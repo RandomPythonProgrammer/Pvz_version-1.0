@@ -1,6 +1,6 @@
 import global_vars
 
-DEBUG = True
+DEBUG = False
 
 global_vars.set_var('level', 'locations/' + input('level: '))
 plants = []
