@@ -215,6 +215,11 @@ class Plant:
 
         self.data = get_data(plant_id)
 
+        try:
+            self.plantable = self.data['plantable']
+        except KeyError:
+            self.plantable = False
+
         self.health = self.data['health']
         self.sprite = pg.image.load(get_data(self.id)['sprite']).convert_alpha()
         self.cost = self.data['cost']
@@ -259,11 +264,23 @@ class Plant:
             return False
 
     def default_requirements(self):
-        for background_object in background_objects:
-            if pg.Rect(background_object.x, background_object.y, SCALE, SCALE).colliderect(self.x, self.y, SCALE, SCALE)\
-                    and background_object.id != 'grave' and self.tile.id not in ["roof", "water"]:
-                return False
-        return True
+        try:
+            self_class = get_data(self.data['class'])
+        except KeyError:
+            self_class = get_data('plants:classes:normal')
+
+        self.return_value = None
+
+        if len(self_class['requirements']) > 1:
+            exec("\n".join(self_class['requirements']))
+
+        else:
+            exec(get_data(self_class['requirements']))
+
+        if self.return_value is not None:
+            return self.return_value
+        else:
+            return False
 
     def attack(self):
         if type(self.data['attack']) == list:
@@ -316,9 +333,9 @@ class Tile:
         self.x = x
         self.y = y
         self.occupied = False
+        self.occupied_plant = None
         self.species = random.randint(1, 4)
         self.version = version
-        # this is a placeholder that will change later to reflect the level such as pool or roof
         self.id = 'grass'
         path = location_data['tiles'] + '/' + "tile" + str(self.version) + '-' + str(self.species) + '.png'
         self.sprite = pg.image.load(path)
@@ -593,9 +610,10 @@ while run:
             for item in bottom_bar.items:
                 if item['id'] == selected_plant and item['cooldown'] <= 0 and sun_count >= get_data(selected_plant)['cost']:
                     for tile in tiles:
-                        if not tile.occupied and pg.Rect(tile.x, tile.y, SCALE, SCALE).collidepoint(pg.mouse.get_pos()):
+                        if (not tile.occupied or tile.occupied_plant.plantable) and pg.Rect(tile.x, tile.y, SCALE, SCALE).collidepoint(pg.mouse.get_pos()):
                             if Plant(selected_plant, tile, frame_num=frame).requirements():
                                 tile.occupied = True
+                                tile.occupied_plant = selected_plant
                                 plants.append(Plant(selected_plant, tile, frame_num=frame))
                                 sun_count -= get_data(selected_plant)['cost']
                                 for item in bottom_bar.items:
@@ -621,6 +639,7 @@ while run:
         for plant in plants:
             if pg.Rect(plant.x, plant.y, SCALE, SCALE).collidepoint(pg.mouse.get_pos()):
                 plant.tile.occupied = False
+                plant.tile.occupied_plant = None
                 plants.remove(plant)
                 Sound('sounds:remove').play()
 

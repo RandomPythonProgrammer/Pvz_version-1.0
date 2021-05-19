@@ -1,0 +1,20 @@
+{
+  "requirements": [
+    "count = 0",
+    "for object in background_objects:",
+    "    if object.id == 'grave' and pg.Rect(object.x, object.y, SCALE, SCALE).colliderect(self.x, self.y, SCALE, SCALE):",
+    "        count += 1",
+    "for tile in tiles:",
+    "    if tile.id not in get_data('plants:classes:normal')['allowed_tiles'] and pg.Rect(tile.x, tile.y, SCALE, SCALE).colliderect(self.x, self.y, SCALE, SCALE):",
+    "        count += 1",
+    "if count == 0:",
+    "    self.return_value = True",
+    "for plant in plants:",
+    "    if pg.Rect(plant.x, plant.y, SCALE, SCALE).colliderect(self.x, self.y, SCALE, SCALE):",
+    "        if plant.plantable:",
+    "            self.return_value = True"
+  ],
+  "allowed_tiles": [
+    "grass"
+  ]
+}
