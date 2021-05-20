@@ -482,7 +482,7 @@ def tick(frame_number):
                     image_source='data/other/menus/wave.png',
                     location=(0, 0),
                     drawable_id='wave',
-                 )
+                )
                 )
 
                 wave_mode = True
@@ -635,9 +635,9 @@ while run:
 
         for item in bottom_bar.items:
             if pg.Rect(item['x'], item['y'], SCALE, SCALE).collidepoint(pg.mouse.get_pos()) and selected_plant != item['id']:
-                    selected_plant = item['id']
-                    bottom_bar.selected = item['id']
-                    Sound('sounds:select').play()
+                selected_plant = item['id']
+                bottom_bar.selected = item['id']
+                Sound('sounds:select').play()
 
     if pg.mouse.get_pressed()[2]:
         for plant in plants:
