@@ -1,0 +1,17 @@
+Index: launcher.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import global_vars\r\n\r\nDEBUG = True\r\n\r\nglobal_vars.set_var('level', 'locations/' + input('level: '))\r\nplants = []\r\nprint(\"Choose Plants:\")\r\nstop = False\r\nwhile len(plants) < 6 and not stop:\r\n    choice = input()\r\n    if choice != '':\r\n        plants.append(\"plants:\" + choice)\r\n    else:\r\n        stop = True\r\n\r\nglobal_vars.set_var(\r\n    'plants', plants\r\n)\r\nglobal_vars.set_var('DEBUG', DEBUG)\r\n\r\nimport main\r\n\r\ntry:\r\n    if global_vars.get_var(\"complete\"):\r\n        print(\"You beat: \" + global_vars.get_var(\"level\").split(\":\")[1] + \"!\")\r\nexcept KeyError:\r\n    pass\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- launcher.py	(revision 951cb77543247501572da5c7553bbc39dab0460c)
++++ launcher.py	(date 1621376907599)
+@@ -1,6 +1,6 @@
+ import global_vars
+ 
+-DEBUG = True
++DEBUG = False
+ 
+ global_vars.set_var('level', 'locations/' + input('level: '))
+ plants = []
