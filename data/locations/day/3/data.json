@@ -1,27 +1,27 @@
 {
   "waves": [
     {
-      "zombies:conehead": 20,
-      "zombies:basic": 25
+      "zombies:conehead": 7,
+      "zombies:basic": 10
     },
     {
-      "zombies:buckethead": 5,
-      "zombies:conehead": 20,
-      "zombies:basic": 20,
+      "zombies:buckethead": 4,
+      "zombies:conehead": 9,
+      "zombies:basic": 12,
       "zombies:polevault": 3
     },
     {
-      "zombies:buckethead": 10,
-      "zombies:conehead": 22,
-      "zombies:basic": 25,
+      "zombies:buckethead": 7,
+      "zombies:conehead": 10,
+      "zombies:basic": 16,
       "zombies:polevault": 5
     }
 
   ],
   "roam_zombies": {
-    "zombies:basic": 35,
+    "zombies:basic": 18,
     "zombies:conehead": 12,
     "zombies:buckethead": 7,
-    "zombies:polevault": 8
+    "zombies:polevault": 5
   }
 }
