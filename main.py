@@ -325,6 +325,7 @@ class Sound:
         self.sound.set_volume(VOLUME)
 
     def play(self):
+        self.sound.stop()
         self.sound.play()
 
 
