@@ -21,3 +21,5 @@ The controls are very simple, just point and click with your mouse, no dragging,
 The code is very flexible and if you want to tweak anything you dont actually really need to edit the main.py but you can just go to the data file and edit the values/functions there, you can even add your own stuff and as long as i follows the rule of the main.py it will be able to run.
 
 There are no animations because I am lazy, and also bad at drawing but I may add them in the future idk.
+
+You can read the HowToPlay.txt to read the instructions for this game.
