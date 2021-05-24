@@ -3,5 +3,11 @@
   "speed": 0.4,
   "health": 1000,
   "sprite": "data/zombies/buckethead/sprite0.png",
+  "tick": [
+  "if self.health <= get_data('zombies:basic')['health'] and self.state == 0:",
+  "    self.state = 1",
+  "    self.sprite = pg.image.load(get_data('zombies:basic')['sprite'])",
+  "self.default_tick(frame_number)"
+  ],
   "damage": 15
 }
