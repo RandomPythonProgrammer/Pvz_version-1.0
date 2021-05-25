@@ -24,4 +24,4 @@ There are no animations because I am lazy, and also bad at drawing but I may add
 
 You can read the HowToPlay.txt to read the instructions for this game.
 
-You can get the exe here:https://www.mediafire.com/file/v0azgr0ozau8j65/PvzClone.zip/file
+You can get the exe here: https://www.mediafire.com/file/v0azgr0ozau8j65/PvzClone.zip/file
