@@ -23,3 +23,5 @@ The code is very flexible and if you want to tweak anything you dont actually re
 There are no animations because I am lazy, and also bad at drawing but I may add them in the future idk.
 
 You can read the HowToPlay.txt to read the instructions for this game.
+
+You can get the exe here:https://www.mediafire.com/file/v0azgr0ozau8j65/PvzClone.zip/file
