@@ -18,7 +18,7 @@ To play you have to run the launcher.py file and then type in the level you want
 
 The controls are very simple, just point and click with your mouse, no dragging, (if you select a plant and press a sun it will also plant it), right click to destroy plants and deselect. 
 
-The code is very flexible and if you want to tweak anything you dont actually really need to edit the main.py but you can just go to the data file and edit the values/functions there, you can even add your own stuff and as long as i follows the rule of the main.py it will be able to run.
+The code is very flexible and if you want to tweak anything you dont actually really need to edit the main.py but you can just go to the data file and edit the values/functions there, you can even add your own stuff and as long as it follows the rule of the main.py it will be able to run.
 
 There are no animations because I am lazy, and also bad at drawing but I may add them in the future idk.
 
