@@ -54,8 +54,8 @@ class Bullet:
         self.y = y
         self.data = get_data(projectile_id)
         self.speed = self.data['projectile_speed']
-        self.change_y = math.sin((angle*180/math.pi))*self.speed
-        self.change_x = math.cos((angle*180/math.pi))*self.speed
+        self.change_y = math.sin((self.angle*math.pi/180))*self.speed
+        self.change_x = math.cos((self.angle*math.pi/180))*self.speed
         if damage is not None:
             self.damage = damage
         else:
