@@ -19,5 +19,3 @@ The controls are very simple, just point and click with your mouse, no dragging,
 The code is very flexible and if you want to tweak anything you dont actually really need to edit the main.py but you can just go to the data file and edit the values/functions there, you can even add your own stuff and as long as it follows the rule of the main.py it will be able to run.
 
 You can read the HowToPlay.txt to read the instructions for this game.
-
-You can get the exe here: https://www.mediafire.com/file/v0azgr0ozau8j65/PvzClone.zip/file
