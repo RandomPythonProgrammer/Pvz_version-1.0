@@ -25,7 +25,7 @@ clock = pg.time.Clock()
 
 def get_data(full_id):
 
-    with open('data/' + "/".join(full_id.split(':')) + '/data.json', 'r') as data_file:
+    with open(os.path.dirname(__file__) + '/data/' + "/".join(full_id.split(':')) + '/data.json', 'r') as data_file:
         return json.load(data_file)
 
 
@@ -46,13 +46,14 @@ class Drawable:
 
     def draw(self, surface):
         surface.blit(self.image, self.location)
-
+3
 
 class Bullet:
     def __init__(self, x, y, projectile_id, damage=None, angle=0):
         self.x = x
         self.y = y
         self.data = get_data(projectile_id)
+        self.angle = angle
         self.speed = self.data['projectile_speed']
         self.change_y = math.sin((self.angle*math.pi/180))*self.speed
         self.change_x = math.cos((self.angle*math.pi/180))*self.speed
