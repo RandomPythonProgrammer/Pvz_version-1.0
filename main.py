@@ -320,10 +320,10 @@ class Sun:
 
 
 class Sound:
-    def __init__(self, sound_id):
+    def __init__(self, sound_id, volume_multiplier=1.0):
         self.source = get_sound(sound_id)
         self.sound = pg.mixer.Sound(self.source)
-        self.sound.set_volume(VOLUME)
+        self.sound.set_volume(VOLUME * volume_multiplier)
 
     def play(self):
         self.sound.stop()
@@ -460,7 +460,7 @@ def tick(frame_number):
             if DEBUG:
                 print("Start Roam")
             pg.mixer.fadeout(4)
-            Sound('sounds:main_theme').play()
+            Sound('sounds:main_theme', 0.5).play()
             roam_zombies = level_data['roam_zombies']
             for key in list(roam_zombies.keys()):
                 for i in range(roam_zombies[key]):
@@ -496,7 +496,7 @@ def tick(frame_number):
         global_vars.set_var("complete", True)
 
     if wave_mode and time.time() - wave_time > 5 and len(zombie_queue) == 0:
-        Sound('sounds:wave_theme').play()
+        Sound('sounds:wave_theme', 0.3).play()
         for drawable in drawables:
             if drawable.id == 'wave':
                 drawables.remove(drawable)
