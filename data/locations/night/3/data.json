@@ -1,22 +1,24 @@
 {
   "waves": [
     {
-      "zombies:conehead": 3,
-      "zombies:basic": 12
+      "zombies:conehead": 4,
+      "zombies:basic": 12,
+      "zombies:newspaper": 3,
+      "zombies:screendoor": 2
     },
     {
       "zombies:buckethead": 1,
       "zombies:conehead": 5,
       "zombies:basic": 15,
-      "zombies:newspaper": 5,
-      "zombies:screendoor": 2
+      "zombies:newspaper": 6,
+      "zombies:screendoor": 4
     },
     {
       "zombies:buckethead": 7,
       "zombies:conehead": 9,
       "zombies:basic": 19,
-      "zombies:newspaper": 7,
-      "zombies:screendoor": 3
+      "zombies:newspaper": 9,
+      "zombies:screendoor": 6
     }
 
   ],
@@ -24,10 +26,10 @@
     "zombies:basic": 11,
     "zombies:conehead": 5,
     "zombies:buckethead": 2,
-    "zombies:newspaper": 3
+    "zombies:newspaper": 5
   },
   "graves": {
     "start": 6,
-    "chance": 1600
+    "chance": 1200
   }
 }
